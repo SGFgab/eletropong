@@ -83,6 +83,7 @@
           <button class="tab" id="tab-btn-ranking" onclick="showTab('ranking',this)">🏆 Ranking</button>
           <button class="tab" onclick="showTab('historico',this)">📜 Histórico</button>
         </div>
+        
         <div id="tab-fila" class="section">
           <div class="card">
             <div class="card-title">Entrar na Partida</div>
@@ -95,6 +96,7 @@
             <button class="btn ghost full" style="margin-top: 30px;" onclick="resetDay()">♻ Resetar Tudo</button>
           </div>
         </div>
+
         <div id="tab-placar" class="section active">
           <div id="no-match" class="card" style="text-align:center; padding: 4rem 1rem; color: var(--muted);">Aguardando jogadores...</div>
           <div id="match-active" style="display:none">
@@ -112,6 +114,7 @@
             </div>
           </div>
         </div>
+
         <div id="tab-ranking" class="section">
           <div class="card">
             <table class="rank-table">
@@ -120,8 +123,10 @@
             </table>
           </div>
         </div>
+
         <div id="tab-historico" class="section"><div class="card" id="hist-list"></div></div>
       </main>
+
       <aside class="sidebar-queue">
         <div class="card" style="position: sticky; top: 100px;">
           <div class="card-title">Fila de Espera</div>
@@ -134,6 +139,7 @@
       </aside>
     </div>
   </div>
+
   <div class="overlay" id="overlay"></div>
   <div class="winner-modal" id="winner-modal">
     <div style="font-size:50px; margin-bottom: 10px">🏆</div>
@@ -143,12 +149,21 @@
   </div>
 
   <script>
-    const WINNING_SCORE = 5; const STORAGE_KEY = 'pingpong_v4';
+    const WINNING_SCORE = 5; 
+    const STORAGE_KEY = 'pingpong_v4';
+    
+    // ESTADO GLOBAL
     let state = { queue: [], match: null, ranking: {}, history: [], lastState: null };
     
     function init() {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) state = JSON.parse(saved);
+      if (saved) {
+          try {
+              state = JSON.parse(saved);
+          } catch(e) {
+              console.error("Erro ao carregar dados", e);
+          }
+      }
       document.getElementById('date-badge').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
       refreshAll();
       if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
@@ -182,6 +197,7 @@
         if (btn) btn.classList.add('active'); 
         if(id==='ranking') renderRanking(); 
         if(id==='historico') renderHistory(); 
+        if(id==='placar') renderMatch(); 
     }
 
     function addToQueue(src) { 
@@ -199,11 +215,16 @@
             <li class="queue-item">
                 <div class="q-num">${i + 1}</div>
                 <span class="q-name">${name}</span>
-                <button class="btn" style="padding:4px 10px; font-size:10px" onclick="removeFromQueue(${i})">✕</button>
+                <button class="btn" style="padding:4px 10px; font-size:10px" onclick="removeFromQueue(${i}); event.stopPropagation();">✕</button>
             </li>
         `).join(''); 
-        document.getElementById('q-list-mob').innerHTML = listHtml || '<li style="text-align:center; padding:20px; color:var(--muted)">Fila vazia</li>'; 
-        document.getElementById('q-list-side').innerHTML = listHtml || '<li style="text-align:center; padding:20px; color:var(--muted)">Fila vazia</li>'; 
+        
+        // Atualiza ambas as listas (Mobile e Desktop)
+        const qMob = document.getElementById('q-list-mob');
+        const qSide = document.getElementById('q-list-side');
+        if(qMob) qMob.innerHTML = listHtml || '<li style="text-align:center; padding:20px; color:var(--muted)">Fila vazia</li>'; 
+        if(qSide) qSide.innerHTML = listHtml || '<li style="text-align:center; padding:20px; color:var(--muted)">Fila vazia</li>'; 
+        
         const minNeeded = state.match ? 1 : 2; 
         const canStart = state.queue.length >= minNeeded; 
         document.getElementById('start-mob').style.display = canStart ? 'block' : 'none'; 
@@ -211,16 +232,21 @@
     }
 
     function removeFromQueue(index) { 
-        state.queue.splice(index, 1); 
-        save(); 
-        renderQueue(); 
+        // Lógica de segurança para remover apenas o index clicado
+        if (index > -1 && index < state.queue.length) {
+            state.queue.splice(index, 1);
+            save(); 
+            renderQueue();
+        }
     }
 
     function startMatch() { 
         if (!state.match) { 
+            if(state.queue.length < 2) return;
             state.match = { p1: state.queue[0], p2: state.queue[1], s1: 0, s2: 0 }; 
             state.queue.splice(0, 2); 
         } else { 
+            if(state.queue.length < 1) return;
             state.match.p2 = state.queue[0]; 
             state.match.s1 = 0; 
             state.match.s2 = 0; 
@@ -234,14 +260,22 @@
     function renderMatch() { 
         const noMatch = document.getElementById('no-match'); 
         const active = document.getElementById('match-active'); 
-        if (!state.match) { noMatch.style.display = 'block'; active.style.display = 'none'; return; } 
-        noMatch.style.display = 'none'; active.style.display = 'block'; 
+        if (!state.match) { 
+            if(noMatch) noMatch.style.display = 'block'; 
+            if(active) active.style.display = 'none'; 
+            return; 
+        } 
+        if(noMatch) noMatch.style.display = 'none'; 
+        if(active) active.style.display = 'block'; 
+        
         document.getElementById('p1name').textContent = state.match.p1; 
         document.getElementById('p2name').textContent = state.match.p2; 
         document.getElementById('p1score').textContent = state.match.s1; 
         document.getElementById('p2score').textContent = state.match.s2; 
+        
         document.getElementById('p1score').className = 'score-num' + (state.match.s1 > state.match.s2 ? ' leading' : ''); 
         document.getElementById('p2score').className = 'score-num' + (state.match.s2 > state.match.s1 ? ' leading' : ''); 
+        
         const dots = document.getElementById('prog-wrap'); 
         dots.innerHTML = Array.from({length: WINNING_SCORE}, (_, i) => `<div class="prog-dot ${i < state.match.s1 ? 'p1' : ''}"></div>`).join('') + '<div style="width:20px"></div>' + Array.from({length: WINNING_SCORE}, (_, i) => `<div class="prog-dot ${i < state.match.s2 ? 'p2' : ''}"></div>`).join(''); 
     }
@@ -261,6 +295,7 @@
 
     function animate(id) { 
         const el = document.getElementById(id); 
+        if(!el) return;
         el.classList.remove('point-anim'); 
         void el.offsetWidth; 
         el.classList.add('point-anim'); 
@@ -271,6 +306,7 @@
         const winner = m.s1 > m.s2 ? m.p1 : m.p2; 
         const loser = m.s1 > m.s2 ? m.p2 : m.p1; 
         state.history.unshift({ win: winner, score: `${m.s1} x ${m.s2}`, players: `${m.p1} vs ${m.p2}`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }); 
+        
         if (!state.ranking[winner]) state.ranking[winner] = { w: 0, d: 0 }; 
         if (!state.ranking[loser]) state.ranking[loser] = { w: 0, d: 0 }; 
         state.ranking[winner].w++; state.ranking[loser].d++; 
@@ -289,11 +325,9 @@
         document.getElementById('winner-modal').style.display = 'none'; 
         document.getElementById('overlay').style.display = 'none'; 
         
-        // Tenta iniciar a próxima partida mantendo o vencedor
         if (state.queue.length > 0) {
             startMatch(); 
         } else {
-            // Se não houver fila, o placar fica "limpo" com o vencedor aguardando
             renderMatch();
         }
     }
@@ -320,7 +354,8 @@
             const rB = state.ranking[b].w / (state.ranking[b].w + state.ranking[b].d || 1);
             return rB - rA || state.ranking[b].w - state.ranking[a].w;
         });
-        document.getElementById('rank-body').innerHTML = sorted.map((name, i) => { 
+        const rBody = document.getElementById('rank-body');
+        if(rBody) rBody.innerHTML = sorted.map((name, i) => { 
             const r = state.ranking[name]; 
             const rate = Math.round((r.w / (r.w + r.d || 1)) * 100); 
             return `<tr><td>${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}</td><td><b>${name}</b></td><td>${r.w}V - ${r.d}D</td><td style="color:${rate >= 50 ? 'var(--primary)' : 'var(--red)'}">${rate}%</td><td><button class="btn danger" style="padding:4px 8px; font-size:10px" onclick="removePlayer('${name}')">Excluir</button></td></tr>`; 
@@ -328,10 +363,12 @@
     }
 
     function renderHistory() { 
-        document.getElementById('hist-list').innerHTML = state.history.map(h => `<div style="padding:15px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center"><div><div style="font-size:11px; color:var(--muted); margin-bottom:4px">${h.time}</div><div style="font-size:14px; font-weight:600">${h.players}</div><div style="font-size:11px; color:var(--primary)">🏆 ${h.win}</div></div><div style="font-family:'Bebas Neue'; font-size:26px">${h.score}</div></div>`).join('') || '<div style="text-align:center; padding:20px; color:var(--muted)">Vazio</div>'; 
+        const hList = document.getElementById('hist-list');
+        if(hList) hList.innerHTML = state.history.map(h => `<div style="padding:15px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center"><div><div style="font-size:11px; color:var(--muted); margin-bottom:4px">${h.time}</div><div style="font-size:14px; font-weight:600">${h.players}</div><div style="font-size:11px; color:var(--primary)">🏆 ${h.win}</div></div><div style="font-family:'Bebas Neue'; font-size:26px">${h.score}</div></div>`).join('') || '<div style="text-align:center; padding:20px; color:var(--muted)">Vazio</div>'; 
     }
 
-    init();
+    // INICIALIZAÇÃO
+    window.onload = init;
   </script>
 </body>
 </html>
