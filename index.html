@@ -12,18 +12,9 @@
   
   <style>
     :root {
-      --bg: #0e0e0e; 
-      --surface: #1a1a1a; 
-      --surface2: #242424; 
-      --border: #2e2e2e;
-      --primary: #ff9800; 
-      --primary-dim: #3d2b1a; 
-      --red: #ff5252; 
-      --red-dim: #3d1a1a;
-      --text: #f0f0f0; 
-      --muted: #888; 
-      --radius: 12px; 
-      --radius-sm: 8px;
+      --bg: #0e0e0e; --surface: #1a1a1a; --surface2: #242424; --border: #2e2e2e;
+      --primary: #ff9800; --primary-dim: #3d2b1a; --red: #ff5252; --red-dim: #3d1a1a;
+      --text: #f0f0f0; --muted: #888; --radius: 12px; --radius-sm: 8px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
@@ -87,12 +78,12 @@
     <div class="main-grid">
       <main>
         <div class="tabs">
-          <button class="tab tab-fila-btn active" onclick="showTab('fila',this)">👥 Fila</button>
-          <button class="tab" id="tab-btn-placar" onclick="showTab('placar',this)">📊 Placar</button>
+          <button class="tab tab-fila-btn" onclick="showTab('fila',this)">👥 Fila</button>
+          <button class="tab active" id="tab-btn-placar" onclick="showTab('placar',this)">📊 Placar</button>
           <button class="tab" id="tab-btn-ranking" onclick="showTab('ranking',this)">🏆 Ranking</button>
           <button class="tab" onclick="showTab('historico',this)">📜 Histórico</button>
         </div>
-        <div id="tab-fila" class="section active">
+        <div id="tab-fila" class="section">
           <div class="card">
             <div class="card-title">Entrar na Partida</div>
             <div class="input-row">
@@ -104,7 +95,7 @@
             <button class="btn ghost full" style="margin-top: 30px;" onclick="resetDay()">♻ Resetar Tudo</button>
           </div>
         </div>
-        <div id="tab-placar" class="section">
+        <div id="tab-placar" class="section active">
           <div id="no-match" class="card" style="text-align:center; padding: 4rem 1rem; color: var(--muted);">Aguardando jogadores...</div>
           <div id="match-active" style="display:none">
             <div class="card">
@@ -154,6 +145,7 @@
   <script>
     const WINNING_SCORE = 5; const STORAGE_KEY = 'pingpong_v4';
     let state = { queue: [], match: null, ranking: {}, history: [], lastState: null };
+    
     function init() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) state = JSON.parse(saved);
@@ -161,35 +153,184 @@
       refreshAll();
       if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
     }
+
     function refreshAll() { updateTopStats(); renderQueue(); renderMatch(); renderRanking(); renderHistory(); }
     function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); updateTopStats(); }
+
     function updateTopStats() {
       const players = Object.keys(state.ranking);
       document.getElementById('ts-partidas').textContent = state.history.length;
       document.getElementById('ts-jogadores').textContent = players.length;
       if (players.length > 0) {
-        const sortedByRate = [...players].sort((a,b) => (state.ranking[b].w/(state.ranking[b].w+state.ranking[b].d)) - (state.ranking[a].w/(state.ranking[a].w+state.ranking[a].d)));
+        const sortedByRate = [...players].sort((a,b) => {
+            const rA = state.ranking[a].w / (state.ranking[a].w + state.ranking[a].d || 1);
+            const rB = state.ranking[b].w / (state.ranking[b].w + state.ranking[b].d || 1);
+            return rB - rA;
+        });
         document.getElementById('ts-lider').textContent = sortedByRate[0];
         const sortedByWins = [...players].sort((a,b) => state.ranking[b].w - state.ranking[a].w);
         document.getElementById('ts-top-winner').textContent = sortedByWins[0];
       } else { document.getElementById('ts-lider').textContent = "—"; document.getElementById('ts-top-winner').textContent = "—"; }
     }
+
     function resetDay() { if(confirm("Resetar tudo?")) { state = { queue: [], match: null, ranking: {}, history: [], lastState: null }; localStorage.removeItem(STORAGE_KEY); refreshAll(); showTab('fila', document.querySelector('.tab-fila-btn')); } }
-    function showTab(id, btn) { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); document.getElementById('tab-' + id).classList.add('active'); if (btn) btn.classList.add('active'); if(id==='ranking') renderRanking(); if(id==='historico') renderHistory(); }
-    function addToQueue(src) { const input = document.getElementById(src === 'mob' ? 'p-input-mob' : 'p-input-side'); const name = input.value.trim().toUpperCase(); if (!name || state.queue.includes(name)) return; state.queue.push(name); input.value = ""; save(); renderQueue(); }
-    function renderQueue() { const listHtml = state.queue.map((name, i) => `<li class="queue-item"><div class="q-num">${i + 1}</div><span class="q-name">${name}</span><button class="btn" style="padding:4px 10px; font-size:10px" onclick="removeFromQueue(${i})">✕</button></li>`).join(''); document.getElementById('q-list-mob').innerHTML = listHtml || '<li style="text-align:center; padding:20px; color:var(--muted)">Fila vazia</li>'; document.getElementById('q-list-side').innerHTML = listHtml || '<li style="text-align:center; padding:20px; color:var(--muted)">Fila vazia</li>'; const minNeeded = state.match ? 1 : 2; const canStart = state.queue.length >= minNeeded; document.getElementById('start-mob').style.display = canStart ? 'block' : 'none'; document.getElementById('start-side').style.display = canStart ? 'block' : 'none'; }
-    function removeFromQueue(index) { state.queue.splice(index, 1); save(); renderQueue(); }
-    function startMatch() { if (!state.match) { state.match = { p1: state.queue[0], p2: state.queue[1], s1: 0, s2: 0 }; state.queue.splice(0, 2); } else { state.match.p2 = state.queue[0]; state.match.s1 = 0; state.match.s2 = 0; state.queue.splice(0, 1); } state.lastState = null; save(); renderMatch(); showTab('placar', document.getElementById('tab-btn-placar')); }
-    function renderMatch() { const noMatch = document.getElementById('no-match'); const active = document.getElementById('match-active'); if (!state.match) { noMatch.style.display = 'block'; active.style.display = 'none'; return; } noMatch.style.display = 'none'; active.style.display = 'block'; document.getElementById('p1name').textContent = state.match.p1; document.getElementById('p2name').textContent = state.match.p2; document.getElementById('p1score').textContent = state.match.s1; document.getElementById('p2score').textContent = state.match.s2; document.getElementById('p1score').className = 'score-num' + (state.match.s1 > state.match.s2 ? ' leading' : ''); document.getElementById('p2score').className = 'score-num' + (state.match.s2 > state.match.s1 ? ' leading' : ''); const dots = document.getElementById('prog-wrap'); dots.innerHTML = Array.from({length: WINNING_SCORE}, (_, i) => `<div class="prog-dot ${i < state.match.s1 ? 'p1' : ''}"></div>`).join('') + '<div style="width:20px"></div>' + Array.from({length: WINNING_SCORE}, (_, i) => `<div class="prog-dot ${i < state.match.s2 ? 'p2' : ''}"></div>`).join(''); }
-    function handlePoint(playerIndex) { if (!state.match) return; state.lastState = JSON.parse(JSON.stringify(state.match)); if (playerIndex === 0) { state.match.s1++; animate('p1score'); } else { state.match.s2++; animate('p2score'); } if (state.match.s1 >= WINNING_SCORE || state.match.s2 >= WINNING_SCORE) finishMatch(); else { save(); renderMatch(); } }
-    function undo() { if (state.lastState) { state.match = JSON.parse(JSON.stringify(state.lastState)); state.lastState = null; save(); renderMatch(); } }
-    function animate(id) { const el = document.getElementById(id); el.classList.remove('point-anim'); void el.offsetWidth; el.classList.add('point-anim'); }
-    function finishMatch() { const m = state.match; const winner = m.s1 > m.s2 ? m.p1 : m.p2; const loser = m.s1 > m.s2 ? m.p2 : m.p1; state.history.unshift({ win: winner, score: `${m.s1} x ${m.s2}`, players: `${m.p1} vs ${m.p2}`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }); if (!state.ranking[winner]) state.ranking[winner] = { w: 0, d: 0 }; if (!state.ranking[loser]) state.ranking[loser] = { w: 0, d: 0 }; state.ranking[winner].w++; state.ranking[loser].d++; state.match = { p1: winner, p2: "Aguardando...", s1: 0, s2: 0 }; save(); document.getElementById('win-name').textContent = winner; document.getElementById('win-score').textContent = `Placar final: ${m.s1} a ${m.s2}`; document.getElementById('winner-modal').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; }
-    function closeWinner() { document.getElementById('winner-modal').style.display = 'none'; document.getElementById('overlay').style.display = 'none'; if (state.queue.length > 0) startMatch(); else { state.match = null; save(); renderMatch(); showTab('fila', document.querySelector('.tab-fila-btn')); } }
-    function cancelMatch() { if (confirm("Cancelar?")) { state.match = null; save(); renderMatch(); renderQueue(); } }
-    function removePlayer(name) { if (confirm(`Excluir ${name}?`)) { delete state.ranking[name]; state.queue = state.queue.filter(p => p !== name); if (state.match && (state.match.p1 === name || state.match.p2 === name)) state.match = null; save(); refreshAll(); } }
-    function renderRanking() { const players = Object.keys(state.ranking); const sorted = players.sort((a,b) => (state.ranking[b].w/(state.ranking[b].w+state.ranking[b].d)) - (state.ranking[a].w/(state.ranking[a].w+state.ranking[a].d)) || state.ranking[b].w - state.ranking[a].w); document.getElementById('rank-body').innerHTML = sorted.map((name, i) => { const r = state.ranking[name]; const rate = Math.round((r.w / (r.w + r.d)) * 100); return `<tr><td>${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}</td><td><b>${name}</b></td><td>${r.w}V - ${r.d}D</td><td style="color:${rate >= 50 ? 'var(--primary)' : 'var(--red)'}">${rate}%</td><td><button class="btn danger" style="padding:4px 8px; font-size:10px" onclick="removePlayer('${name}')">Excluir</button></td></tr>`; }).join('') || '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--muted)">Sem dados</td></tr>'; }
-    function renderHistory() { document.getElementById('hist-list').innerHTML = state.history.map(h => `<div style="padding:15px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center"><div><div style="font-size:11px; color:var(--muted); margin-bottom:4px">${h.time}</div><div style="font-size:14px; font-weight:600">${h.players}</div><div style="font-size:11px; color:var(--primary)">🏆 ${h.win}</div></div><div style="font-family:'Bebas Neue'; font-size:26px">${h.score}</div></div>`).join('') || '<div style="text-align:center; padding:20px; color:var(--muted)">Vazio</div>'; }
+    
+    function showTab(id, btn) { 
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); 
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); 
+        document.getElementById('tab-' + id).classList.add('active'); 
+        if (btn) btn.classList.add('active'); 
+        if(id==='ranking') renderRanking(); 
+        if(id==='historico') renderHistory(); 
+    }
+
+    function addToQueue(src) { 
+        const input = document.getElementById(src === 'mob' ? 'p-input-mob' : 'p-input-side'); 
+        const name = input.value.trim().toUpperCase(); 
+        if (!name || state.queue.includes(name)) return; 
+        if (state.match && (state.match.p1 === name || state.match.p2 === name)) return;
+        state.queue.push(name); 
+        input.value = ""; 
+        save(); renderQueue(); 
+    }
+
+    function renderQueue() { 
+        const listHtml = state.queue.map((name, i) => `
+            <li class="queue-item">
+                <div class="q-num">${i + 1}</div>
+                <span class="q-name">${name}</span>
+                <button class="btn" style="padding:4px 10px; font-size:10px" onclick="removeFromQueue(${i})">✕</button>
+            </li>
+        `).join(''); 
+        document.getElementById('q-list-mob').innerHTML = listHtml || '<li style="text-align:center; padding:20px; color:var(--muted)">Fila vazia</li>'; 
+        document.getElementById('q-list-side').innerHTML = listHtml || '<li style="text-align:center; padding:20px; color:var(--muted)">Fila vazia</li>'; 
+        const minNeeded = state.match ? 1 : 2; 
+        const canStart = state.queue.length >= minNeeded; 
+        document.getElementById('start-mob').style.display = canStart ? 'block' : 'none'; 
+        document.getElementById('start-side').style.display = canStart ? 'block' : 'none'; 
+    }
+
+    function removeFromQueue(index) { 
+        state.queue.splice(index, 1); 
+        save(); 
+        renderQueue(); 
+    }
+
+    function startMatch() { 
+        if (!state.match) { 
+            state.match = { p1: state.queue[0], p2: state.queue[1], s1: 0, s2: 0 }; 
+            state.queue.splice(0, 2); 
+        } else { 
+            state.match.p2 = state.queue[0]; 
+            state.match.s1 = 0; 
+            state.match.s2 = 0; 
+            state.queue.splice(0, 1); 
+        } 
+        state.lastState = null; 
+        save(); renderMatch(); 
+        showTab('placar', document.getElementById('tab-btn-placar')); 
+    }
+
+    function renderMatch() { 
+        const noMatch = document.getElementById('no-match'); 
+        const active = document.getElementById('match-active'); 
+        if (!state.match) { noMatch.style.display = 'block'; active.style.display = 'none'; return; } 
+        noMatch.style.display = 'none'; active.style.display = 'block'; 
+        document.getElementById('p1name').textContent = state.match.p1; 
+        document.getElementById('p2name').textContent = state.match.p2; 
+        document.getElementById('p1score').textContent = state.match.s1; 
+        document.getElementById('p2score').textContent = state.match.s2; 
+        document.getElementById('p1score').className = 'score-num' + (state.match.s1 > state.match.s2 ? ' leading' : ''); 
+        document.getElementById('p2score').className = 'score-num' + (state.match.s2 > state.match.s1 ? ' leading' : ''); 
+        const dots = document.getElementById('prog-wrap'); 
+        dots.innerHTML = Array.from({length: WINNING_SCORE}, (_, i) => `<div class="prog-dot ${i < state.match.s1 ? 'p1' : ''}"></div>`).join('') + '<div style="width:20px"></div>' + Array.from({length: WINNING_SCORE}, (_, i) => `<div class="prog-dot ${i < state.match.s2 ? 'p2' : ''}"></div>`).join(''); 
+    }
+
+    function handlePoint(playerIndex) { 
+        if (!state.match) return; 
+        state.lastState = JSON.parse(JSON.stringify(state.match)); 
+        if (playerIndex === 0) { state.match.s1++; animate('p1score'); } 
+        else { state.match.s2++; animate('p2score'); } 
+        if (state.match.s1 >= WINNING_SCORE || state.match.s2 >= WINNING_SCORE) finishMatch(); 
+        else { save(); renderMatch(); } 
+    }
+
+    function undo() { 
+        if (state.lastState) { state.match = JSON.parse(JSON.stringify(state.lastState)); state.lastState = null; save(); renderMatch(); } 
+    }
+
+    function animate(id) { 
+        const el = document.getElementById(id); 
+        el.classList.remove('point-anim'); 
+        void el.offsetWidth; 
+        el.classList.add('point-anim'); 
+    }
+
+    function finishMatch() { 
+        const m = state.match; 
+        const winner = m.s1 > m.s2 ? m.p1 : m.p2; 
+        const loser = m.s1 > m.s2 ? m.p2 : m.p1; 
+        state.history.unshift({ win: winner, score: `${m.s1} x ${m.s2}`, players: `${m.p1} vs ${m.p2}`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }); 
+        if (!state.ranking[winner]) state.ranking[winner] = { w: 0, d: 0 }; 
+        if (!state.ranking[loser]) state.ranking[loser] = { w: 0, d: 0 }; 
+        state.ranking[winner].w++; state.ranking[loser].d++; 
+        
+        // Vencedor permanece como P1
+        state.match = { p1: winner, p2: "Aguardando...", s1: 0, s2: 0 }; 
+        save(); 
+
+        document.getElementById('win-name').textContent = winner; 
+        document.getElementById('win-score').textContent = `Placar final: ${m.s1} a ${m.s2}`; 
+        document.getElementById('winner-modal').style.display = 'block'; 
+        document.getElementById('overlay').style.display = 'block'; 
+    }
+
+    function closeWinner() { 
+        document.getElementById('winner-modal').style.display = 'none'; 
+        document.getElementById('overlay').style.display = 'none'; 
+        
+        // Tenta iniciar a próxima partida mantendo o vencedor
+        if (state.queue.length > 0) {
+            startMatch(); 
+        } else {
+            // Se não houver fila, o placar fica "limpo" com o vencedor aguardando
+            renderMatch();
+        }
+    }
+
+    function cancelMatch() { 
+        if (confirm("Cancelar?")) { 
+            state.match = null; save(); renderMatch(); renderQueue(); 
+        } 
+    }
+
+    function removePlayer(name) { 
+        if (confirm(`Excluir ${name}?`)) { 
+            delete state.ranking[name]; 
+            state.queue = state.queue.filter(p => p !== name); 
+            if (state.match && (state.match.p1 === name || state.match.p2 === name)) state.match = null; 
+            save(); refreshAll(); 
+        } 
+    }
+
+    function renderRanking() { 
+        const players = Object.keys(state.ranking); 
+        const sorted = players.sort((a,b) => {
+            const rA = state.ranking[a].w / (state.ranking[a].w + state.ranking[a].d || 1);
+            const rB = state.ranking[b].w / (state.ranking[b].w + state.ranking[b].d || 1);
+            return rB - rA || state.ranking[b].w - state.ranking[a].w;
+        });
+        document.getElementById('rank-body').innerHTML = sorted.map((name, i) => { 
+            const r = state.ranking[name]; 
+            const rate = Math.round((r.w / (r.w + r.d || 1)) * 100); 
+            return `<tr><td>${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}</td><td><b>${name}</b></td><td>${r.w}V - ${r.d}D</td><td style="color:${rate >= 50 ? 'var(--primary)' : 'var(--red)'}">${rate}%</td><td><button class="btn danger" style="padding:4px 8px; font-size:10px" onclick="removePlayer('${name}')">Excluir</button></td></tr>`; 
+        }).join('') || '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--muted)">Sem dados</td></tr>'; 
+    }
+
+    function renderHistory() { 
+        document.getElementById('hist-list').innerHTML = state.history.map(h => `<div style="padding:15px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center"><div><div style="font-size:11px; color:var(--muted); margin-bottom:4px">${h.time}</div><div style="font-size:14px; font-weight:600">${h.players}</div><div style="font-size:11px; color:var(--primary)">🏆 ${h.win}</div></div><div style="font-family:'Bebas Neue'; font-size:26px">${h.score}</div></div>`).join('') || '<div style="text-align:center; padding:20px; color:var(--muted)">Vazio</div>'; 
+    }
+
     init();
   </script>
 </body>
