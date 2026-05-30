@@ -2,281 +2,1158 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🏓 Ping Pong Pro — Final</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🏓 ELT TT Tournament</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ff9800">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* ── THEMES ─────────────────────────────────────────────── */
     :root {
-      --bg: #0e0e0e; --surface: #1a1a1a; --surface2: #242424; --border: #2e2e2e;
-      --primary: #ff9800; --primary-dim: #3d2b1a; --red: #ff5252; --red-dim: #3d1a1a;
-      --text: #f0f0f0; --muted: #888; --radius: 12px; --radius-sm: 8px;
+      --bg: #0e0e0e;
+      --surface: #1a1a1a;
+      --surface2: #242424;
+      --border: #2e2e2e;
+      --primary: #ff9800;
+      --primary-dim: #3d2b1a;
+      --primary-text: #000;
+      --red: #ff5252;
+      --red-dim: #3d1a1a;
+      --text: #f0f0f0;
+      --muted: #888;
+      --shadow: rgba(0,0,0,0.4);
+      --radius: 14px;
+      --radius-sm: 10px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
-    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; }
-    header .logo { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--primary); }
-    .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
-    .main-grid { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; align-items: start; }
-    .top-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
-    .metric { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; text-align: center; }
-    .metric-val { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .metric-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
-    .tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px; margin-bottom: 1.5rem; }
-    .tab { flex: 1; padding: 12px; font-size: 13px; font-weight: 500; cursor: pointer; background: transparent; color: var(--muted); border: none; border-radius: var(--radius-sm); transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .tab.active { background: var(--primary); color: #000; font-weight: 600; }
+    body.theme-light {
+      --bg: #f5f0ea;
+      --surface: #ffffff;
+      --surface2: #f0ebe2;
+      --border: #e0d8cc;
+      --primary: #ff9800;
+      --primary-dim: #fff0dd;
+      --primary-text: #000;
+      --red: #e53935;
+      --red-dim: #fce4e4;
+      --text: #1a1005;
+      --muted: #9a8870;
+      --shadow: rgba(0,0,0,0.12);
+    }
+
+    /* ── THEME TRANSITION ───────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box; margin: 0; padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 1.2s ease, border-color 1.2s ease, color 1.2s ease;
+    }
+    /* override transition for animations that need to be instant */
+    .point-anim, .prog-dot, .score-num, .tab, .btn { transition: background-color 1.2s ease, border-color 1.2s ease, color 1.2s ease, transform 0.1s ease; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; font-size: 15px; line-height: 1.2; }
+
+    /* ── HEADER ─────────────────────────────────────────────── */
+    header { background: var(--surface); border-bottom: 2px solid var(--border); padding: 0.5rem 1.5rem; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px var(--shadow); }
+    .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 3px; color: var(--primary); white-space: nowrap; }
+#ts-lider { animation: pulse 2s infinite; } @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+    .header-center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+    .theme-toggle-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .theme-toggle-btn:active { opacity: 0.7; }
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 1px;
+    }
+    #clock {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      color: var(--primary);
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+    #date-badge { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+    /* ── LAYOUT ─────────────────────────────────────────────── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0.5rem 1.5rem; }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    /* ── TOP STATS ──────────────────────────────────────────── */
+    .top-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1.1rem;
+      text-align: center;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    .metric-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      color: var(--primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .metric-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
+
+    /* ── TABS ───────────────────────────────────────────────── */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 5px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    .tab {
+      flex: 1;
+      padding: 14px 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: var(--muted);
+      border: none;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 52px;
+    }
+    .tab.active { background: var(--primary); color: var(--primary-text); }
+    .tab:active:not(.active) { background: var(--surface2); }
     .section { display: none; }
     .section.active { display: block; }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; }
-    .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1px; color: var(--muted); margin-bottom: 1rem; }
-    .input-row { display: flex; gap: 8px; margin-bottom: 1rem; }
-    input[type=text] { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); padding: 12px; outline: none; font-family: 'DM Sans', sans-serif; }
+
+    /* ── CARDS ──────────────────────────────────────────────── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 0.5rem; box-shadow: 0 2px 8px var(--shadow); }
+    .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 0.5rem; }
+
+    /* ── INPUTS & BUTTONS ───────────────────────────────────── */
+    .input-row { display: flex; gap: 8px; margin-bottom: 1rem; align-items: center; width: 100%; }
+input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); color: var(--text); padding: 8px 12px; font-size: 15px; outline: none; font-family: 'DM Sans', sans-serif; height: 44px; }
+    input[type=text] {
+      flex: 1;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      padding: 12px 14px;
+      font-size: 15px;
+      outline: none;
+      font-family: 'DM Sans', sans-serif;
+      min-height: 50px;
+      height: 50px;
+    }
     input[type=text]:focus { border-color: var(--primary); }
-    .btn { padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface2); color: var(--text); transition: all .15s; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; justify-content: center; }
-    .btn.primary { background: var(--primary); color: #000; border-color: var(--primary); }
+    .btn { padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--surface2); color: var(--text); font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; white-space: nowrap; flex-shrink: 0; }
+    .btn:active { transform: scale(0.97); opacity: 0.85; }
+    .btn.primary { background: var(--primary); color: var(--primary-text); border-color: var(--primary); }
     .btn.danger { background: var(--red-dim); color: var(--red); border-color: var(--red); }
-    .btn.ghost { background: transparent; border-color: transparent; color: var(--muted); font-size: 11px; }
+    .btn.ghost { background: transparent; border-color: transparent; color: var(--muted); font-size: 12px; }
     .btn.full { width: 100%; }
-    .scoreboard { display: grid; grid-template-columns: 1fr 40px 1fr; align-items: center; text-align: center; gap: 10px; }
-    .score-area { cursor: pointer; padding: 30px 10px; border-radius: var(--radius); background: rgba(255,255,255,0.02); border: 1px solid transparent; transition: all 0.1s ease; user-select: none; }
-    .score-area:active { background: var(--primary-dim); transform: scale(0.98); border-color: var(--primary); }
-    .score-num { font-family: 'Bebas Neue', sans-serif; font-size: 80px; line-height: 1; color: var(--muted); margin: 10px 0; }
-    .score-num.leading { color: var(--primary); }
-    .tap-hint { font-size: 9px; color: var(--border); text-transform: uppercase; letter-spacing: 1px; }
-    @keyframes pointPop { 0% { transform: scale(1); } 50% { transform: scale(1.1); color: #fff; } 100% { transform: scale(1); } }
-    .point-anim { animation: pointPop 0.3s ease-out; }
+    .btn.lg { min-height: 58px; height: auto; font-size: 16px; padding: 16px 20px; }
+
+    /* ── SCORE SELECTOR ─────────────────────────────────────── */
+    .score-selector { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+    .score-selector label { flex: 1; }
+    .score-selector input[type=radio] { display: none; }
+    .score-opt {
+      display: block; text-align: center; padding: 12px 0;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--muted);
+      cursor: pointer; background: var(--surface2);
+    }
+    .score-selector input[type=radio]:checked + .score-opt {
+      border-color: var(--primary); color: var(--primary); background: var(--primary-dim);
+    }
+
+    /* ── SCOREBOARD ─────────────────────────────────────────── */
+    .scoreboard {
+      display: grid;
+      grid-template-columns: 1fr 50px 1fr;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+    }
+    .score-area {
+      cursor: pointer;
+      padding: 55px 1px;
+      border-radius: var(--radius);
+      background: var(--surface2);
+      border: 2px solid transparent;
+      user-select: none;
+      position: relative;
+      overflow: hidden;
+    }
+    .score-area::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--primary);
+      opacity: 0;
+      transition: opacity 0.1s;
+      pointer-events: none;
+    }
+    .score-area:active::after { opacity: 0.08; }
+    .score-area:active { border-color: var(--primary); transform: scale(0.99); }
+    .player-name-score {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .score-num { font-family: 'Bebas Neue', sans-serif; font-size: 100px; line-height: 1; color: var(--primary); margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+.score-num.leading { color: #ffffff; text-shadow: 0 0 15px var(--primary); }
+    .vs-badge {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      color: var(--border);
+      text-align: center;
+    }
+    .tap-hint-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .tap-hint { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; }
+    .key-hint {
+      display: inline-block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 2px 8px;
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    @keyframes pointPop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    .point-anim { animation: pointPop 0.25s ease-out; }
+
+    /* ── PROGRESS DOTS ──────────────────────────────────────── */
+    .prog-wrap { display: flex; gap: 5px; margin-bottom: 1.5rem; }
+    .prog-dot { flex: 1; height: 8px; border-radius: 4px; background: var(--surface2); }
+    .prog-dot.p1 { background: var(--primary); }
+    .prog-dot.p2 { background: #7c7cf5; }
+
+    /* ── ROTATION HINT ──────────────────────────────────────── */
+    .rotation-info {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      padding: 10px 0 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .rotation-info span { color: var(--primary); font-weight: 700; }
+
+    /* ── QUEUE LIST ─────────────────────────────────────────── */
     .queue-list { list-style: none; }
-    .queue-item { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border); }
-    .q-num { width: 26px; height: 26px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
-    .q-name { flex: 1; font-size: 14px; font-weight: 500; }
+    .queue-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .queue-item:last-child { border-bottom: none; }
+    .q-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .q-num.playing { background: var(--primary); color: var(--primary-text); }
+    .q-name { flex: 1; font-size: 15px; font-weight: 600; }
+    .q-badge {
+      font-size: 11px; color: var(--primary);
+      background: var(--primary-dim);
+      padding: 3px 10px; border-radius: 99px;
+      font-weight: 700;
+    }
+
+    /* ── RANKING TABLE ──────────────────────────────────────── */
     .rank-table { width: 100%; border-collapse: collapse; }
-    .rank-table th { text-align: left; color: var(--muted); font-size: 11px; padding: 12px; border-bottom: 1px solid var(--border); text-transform: uppercase; }
-    .rank-table td { padding: 14px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
-    @media (min-width: 851px) { .tab-fila-btn { display: none; } }
-    @media (max-width: 850px) { .main-grid { grid-template-columns: 1fr; } .sidebar-queue { display: none; } .top-stats { grid-template-columns: 1fr 1fr; } .score-num { font-size: 60px; } }
-    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; backdrop-filter: blur(5px); }
-    .winner-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--surface); border: 2px solid var(--primary); border-radius: var(--radius); padding: 2.5rem; text-align: center; z-index: 201; width: 320px; }
+    .rank-table th {
+      text-align: left; color: var(--muted);
+      font-size: 11px; padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .rank-table td { padding: 15px 14px; border-bottom: 1px solid var(--border); font-size: 15px; }
+    .rank-table tr:last-child td { border-bottom: none; }
+
+    /* ── OVERLAY & MODAL ────────────────────────────────────── */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 200; backdrop-filter: blur(6px);
+    }
+    .winner-modal {
+      display: none; position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--surface);
+      border: 2px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 3rem 2.5rem;
+      text-align: center;
+      z-index: 201;
+      width: min(420px, 90vw);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .winner-trophy { font-size: 64px; margin-bottom: 8px; animation: trophyBounce 0.6s ease; }
+    @keyframes trophyBounce {
+      0% { transform: scale(0); } 70% { transform: scale(1.15); } 100% { transform: scale(1); }
+    }
+    .winner-name-display {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 40px;
+      color: var(--primary);
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    /* ── CONFETTI ───────────────────────────────────────────── */
+    #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 202; display: none; }
+
+    /* ── FOOTER ─────────────────────────────────────────────── */
+    footer { margin-top: 0.5rem; padding: 0.5rem 1.5rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.footer-trivia { width: 100%; border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.5rem; display: flex; align-items: baseline; gap: 8px; }
+    .footer-stats {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .footer-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .footer-stat-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      color: var(--primary);
+    }
+    .footer-stat-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .footer-right { font-size: 11px; color: var(--muted); text-align: right; }
+    .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--muted); letter-spacing: 2px; }
+
+    /* ── TRIVIA ─────────────────────────────────────────────── */
+    .footer-trivia {
+      width: 100%;
+      border-top: 1px solid var(--border);
+      margin-top: 1rem;
+      padding-top: 0.9rem;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .trivia-label {
+      font-size: 15px;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .trivia-text { font-size: 13px; color: var(--muted); line-height: 1.2; opacity: 0; transition: opacity 1s ease; }
+    .trivia-text.visible { opacity: 1; }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+      .sidebar-queue { display: none; }
+      .top-stats { grid-template-columns: 1fr 1fr; }
+      .score-num { font-size: 80px; }
+    }
+    @media (min-width: 901px) { .tab-fila-btn { display: none; } }
+
+    /* ── DIVIDER ────────────────────────────────────────────── */
+    .divider { border: 0; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+
+    /* ── SESSION TIMER ──────────────────────────────────────── */
+    #session-timer { font-size: 11px; color: var(--muted); }
+    #session-timer span { color: var(--primary); font-weight: 700; }
   </style>
 </head>
 <body>
-  <header><div class="logo">🏓 PINGPONG PRO</div><div style="margin-left:auto; font-size: 12px; color: var(--muted)" id="date-badge"></div></header>
-  <div class="container">
-    <div class="top-stats">
-      <div class="metric"><div class="metric-val" id="ts-partidas">0</div><div class="metric-lbl">Partidas</div></div>
-      <div class="metric"><div class="metric-val" id="ts-jogadores">0</div><div class="metric-lbl">Jogadores</div></div>
-      <div class="metric" style="border-color: var(--primary)"><div class="metric-val" id="ts-lider">—</div><div class="metric-lbl">Top Player</div></div>
-      <div class="metric"><div class="metric-val">🏆</div><div class="metric-lbl">PRO Mode</div></div>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <header>
+    <div class="logo-text">🏓 ELT TT TOURNAMENT</div>
+    <div class="header-center">
+      <button class="theme-toggle-btn" onclick="toggleTheme()" id="theme-btn">
+        <span id="theme-icon">☀️</span>
+        <span id="theme-label">Modo Claro</span>
+      </button>
     </div>
+    <div class="header-right">
+      <div id="clock">00:00:00</div>
+      <div id="date-badge">—</div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- TOP STATS -->
+    <div class="top-stats">
+      <div class="metric">
+        <div class="metric-val" id="ts-partidas">0</div>
+        <div class="metric-lbl">Partidas</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="ts-jogadores">0</div>
+        <div class="metric-lbl">Jogadores</div>
+      </div>
+      <div class="metric" style="border-color: var(--primary)">
+        <div class="metric-val" id="ts-lider">—</div>
+        <div class="metric-lbl">Líder</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="ts-na-fila">0</div>
+        <div class="metric-lbl">Na Fila</div>
+      </div>
+    </div>
+
     <div class="main-grid">
       <main>
         <div class="tabs">
           <button class="tab tab-fila-btn" onclick="showTab('fila',this)">👥 Fila</button>
-          <button class="tab active" id="tab-btn-placar" onclick="showTab('placar',this)">📊 Placar</button>
+          <button class="tab active" id="tab-btn-placar" onclick="showTab('placar',this)">▶ Partida</button>
           <button class="tab" id="tab-btn-ranking" onclick="showTab('ranking',this)">🏆 Ranking</button>
           <button class="tab" onclick="showTab('historico',this)">📜 Histórico</button>
         </div>
+
+        <!-- TAB FILA (mobile/tablet) -->
         <div id="tab-fila" class="section">
           <div class="card">
-            <div class="card-title">Novo Jogador</div>
+            <div class="card-title">Adicionar Jogador</div>
             <div class="input-row">
-              <input type="text" id="p-input-mob" placeholder="Nome..." onkeydown="if(event.key==='Enter')addToQueue('mob')">
-              <button class="btn primary" onclick="addToQueue('mob')">Entrar</button>
+              <input type="text" id="p-input-mob" placeholder="Nome do jogador..." onkeydown="if(event.key==='Enter')addToQueue('mob')">
+              <button class="btn primary" onclick="addToQueue('mob')">+ Adicionar</button>
+            </div>
+            <div class="card-title" style="margin-bottom:10px">Pontuação da Partida</div>
+            <div class="score-selector">
+              <label><input type="radio" name="score-mob" value="3" onchange="setScore(3)"><span class="score-opt">3 pts</span></label>
+              <label><input type="radio" name="score-mob" value="5" onchange="setScore(5)" checked><span class="score-opt">5 pts</span></label>
+              <label><input type="radio" name="score-mob" value="11" onchange="setScore(11)"><span class="score-opt">11 pts</span></label>
             </div>
             <ul class="queue-list" id="q-list-mob"></ul>
-            <button id="start-mob" class="btn primary full" style="display:none; margin-top:15px" onclick="startMatch()">▶ Iniciar Partida</button>
-            <button class="btn ghost full" style="margin-top: 30px;" onclick="resetDay()">♻ Resetar Sistema</button>
+            <button id="start-mob" class="btn primary full lg" style="display:none; margin-top:16px" onclick="startMatch()">▶ Iniciar Partida</button>
+            <hr class="divider">
+            <button class="btn ghost full" onclick="resetDay()">♻ Resetar Tudo</button>
           </div>
         </div>
+
+        <!-- TAB PARTIDA -->
         <div id="tab-placar" class="section active">
-          <div id="no-match" class="card" style="text-align:center; padding: 4rem 1rem; color: var(--muted);">Aguardando jogadores na fila...</div>
+          <div id="no-match" class="card" style="text-align:center; padding: 5rem 1rem; color: var(--muted);">
+            <div style="font-size: 48px; margin-bottom: 12px">🏓</div>
+            <div style="font-family:'Bebas Neue'; font-size:20px; letter-spacing:1px;">Aguardando jogadores na fila...</div>
+          </div>
           <div id="match-active" style="display:none">
             <div class="card">
+              <div class="prog-wrap" id="prog-wrap"></div>
               <div class="scoreboard">
-                <div class="score-area" onclick="handlePoint(0)"><div class="metric-lbl" id="p1name">P1</div><div class="score-num" id="p1score">0</div><div class="tap-hint">Toque para pontuar</div></div>
-                <div style="font-family:'Bebas Neue'; color:var(--border); font-size:24px">VS</div>
-                <div class="score-area" onclick="handlePoint(1)"><div class="metric-lbl" id="p2name">P2</div><div class="score-num" id="p2score">0</div><div class="tap-hint">Toque para pontuar</div></div>
+                <div class="score-area" onclick="handlePoint(0)">
+                  <div class="player-name-score" id="p1name">P1</div>
+                  <div class="score-num" id="p1score">0</div>
+                  <div class="tap-hint-wrap">
+                    <div class="tap-hint">Toque para pontuar</div>
+                    <div><span class="key-hint">1</span></div>
+                  </div>
+                </div>
+                <div class="vs-badge">VS</div>
+                <div class="score-area" onclick="handlePoint(1)">
+                  <div class="player-name-score" id="p2name">P2</div>
+                  <div class="score-num" id="p2score">0</div>
+                  <div class="tap-hint-wrap">
+                    <div class="tap-hint">Toque para pontuar</div>
+                    <div><span class="key-hint">2</span></div>
+                  </div>
+                </div>
               </div>
-              <div style="display: flex; gap: 10px; margin-top: 2rem;">
-                  <button class="btn full" style="flex: 1;" onclick="undo()">↩ Desfazer</button>
-                  <button class="btn danger full" style="flex: 1;" onclick="cancelMatch()">✕ Cancelar</button>
+              <div id="rotation-hint" class="rotation-info"></div>
+              <div style="display:flex; gap:10px; margin-top:1.25rem;">
+                <button class="btn full lg" style="flex:1" onclick="undo()">↩ Desfazer</button>
+                <button class="btn danger full lg" style="flex:1" onclick="cancelMatch()">✕ Cancelar</button>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- TAB RANKING -->
         <div id="tab-ranking" class="section">
-          <div class="card"><table class="rank-table"><thead><tr><th>#</th><th>Jogador</th><th>V/D</th><th>%</th><th>Remover</th></tr></thead><tbody id="rank-body"></tbody></table></div>
+          <div class="card">
+            <table class="rank-table">
+              <thead>
+                <tr>
+                  <th>Pos</th><th>Jogador</th><th>V / D</th><th>Taxa</th><th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="rank-body"></tbody>
+            </table>
+          </div>
         </div>
-        <div id="tab-historico" class="section"><div class="card" id="hist-list"></div></div>
+
+        <!-- TAB HISTÓRICO -->
+        <div id="tab-historico" class="section">
+          <div class="card" id="hist-list"></div>
+        </div>
       </main>
+
+      <!-- SIDEBAR -->
       <aside class="sidebar-queue">
-        <div class="card" style="position: sticky; top: 100px;">
-          <div class="card-title">Próximos da Fila</div>
-          <div class="input-row"><input type="text" id="p-input-side" placeholder="Nome..." onkeydown="if(event.key==='Enter')addToQueue('side')"><button class="btn primary" onclick="addToQueue('side')">+</button></div>
+        <div class="card" style="position:sticky; top:90px;">
+          <div class="card-title">Fila de Espera</div>
+          <div class="input-row">
+            <input type="text" id="p-input-side" placeholder="Nome..." onkeydown="if(event.key==='Enter')addToQueue('side')">
+            <button class="btn primary" style="min-width: 44px; height: 44px; padding: 0;" onclick="addToQueue('side')">+</button>
+          </div>
+          <div class="card-title" style="margin-bottom:8px; font-size:13px">Pontuação</div>
+          <div class="score-selector">
+            <label><input type="radio" name="score-side" value="3" onchange="setScore(3)"><span class="score-opt">3</span></label>
+            <label><input type="radio" name="score-side" value="5" onchange="setScore(5)" checked><span class="score-opt">5</span></label>
+            <label><input type="radio" name="score-side" value="11" onchange="setScore(11)"><span class="score-opt">11</span></label>
+          </div>
           <ul class="queue-list" id="q-list-side"></ul>
-          <button id="start-side" class="btn primary full" style="display:none; margin-top:15px" onclick="startMatch()">▶ Iniciar Próxima</button>
-          <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
-          <button class="btn ghost full" onclick="resetDay()">♻ Limpar Tudo</button>
+          <button id="start-side" class="btn primary full lg" style="display:none; margin-top:14px" onclick="startMatch()">▶ Iniciar Partida</button>
+          <hr class="divider">
+          <div id="session-timer" style="text-align:center; margin-bottom:12px"></div>
+          <button class="btn ghost full" onclick="resetDay()">♻ Resetar Tudo</button>
         </div>
       </aside>
     </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-stats">
+        <div class="footer-stat">
+          <div class="footer-stat-val" id="ft-partidas">0</div>
+          <div class="footer-stat-lbl">Partidas hoje</div>
+        </div>
+        <div class="footer-stat">
+          <div class="footer-stat-val" id="ft-media">—</div>
+          <div class="footer-stat-lbl">Média pts/partida</div>
+        </div>
+        <div class="footer-stat">
+          <div class="footer-stat-val" id="ft-sequencia">—</div>
+          <div class="footer-stat-lbl">Maior sequência</div>
+        </div>
+        <div class="footer-stat">
+          <div class="footer-stat-val" id="ft-disputada">—</div>
+          <div class="footer-stat-lbl">Partida mais disputada</div>
+        </div>
+      </div>
+      <div class="footer-right">
+        <div class="footer-logo">ELT TT TOURNAMENT</div>
+        <div style="margin-top:4px">Teclas: <b>1</b> pt A · <b>2</b> pt B · <b>Enter</b> próxima</div>
+      </div>
+      <div class="footer-trivia">
+        <div class="trivia-label">🏓 sabia que...</div>
+        <div class="trivia-text" id="trivia-text"></div>
+      </div>
+    </footer>
   </div>
+
+  <!-- MODAL VENCEDOR -->
   <div class="overlay" id="overlay"></div>
   <div class="winner-modal" id="winner-modal">
-    <div style="font-size:50px; margin-bottom: 10px">🏆</div>
-    <div class="card-title" id="win-name" style="color:var(--primary); font-size:28px; margin-bottom: 5px"></div>
-    <div class="metric-lbl" id="win-score" style="margin-bottom:25px; font-size: 14px"></div>
-    <button class="btn primary full" onclick="closeWinner()">Próxima Partida</button>
+    <div class="winner-trophy">🏆</div>
+    <div class="winner-name-display" id="win-name"></div>
+    <div style="font-size:15px; color:var(--muted); margin-bottom:6px" id="win-score"></div>
+    <div style="font-size:12px; color:var(--muted); margin-bottom:28px" id="win-next"></div>
+    <button class="btn primary full lg" onclick="closeWinner()">
+      Próxima Partida ▶ &nbsp;
+      <span class="key-hint" style="background:rgba(0,0,0,0.15);border-color:rgba(0,0,0,0.2);color:var(--primary-text)">Enter</span>
+    </button>
   </div>
 
   <script>
-    const WINNING_SCORE = 5; 
-    const STORAGE_KEY = 'pingpong_v_final';
-    let state = { queue: [], match: null, ranking: {}, history: [], lastState: null };
-    
-    function init() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) state = JSON.parse(saved);
-      document.getElementById('date-badge').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-      refreshAll();
+    /* ═══════════════════════════════════════════════════════════
+       STATE & CONSTANTS
+    ═══════════════════════════════════════════════════════════ */
+    let WINNING_SCORE = 5;
+    const STORAGE_KEY = 'elt_tt_v1';
+    let state = {
+      allPlayers: [], queue: [], match: null,
+      ranking: {}, history: [], lastState: null,
+      winScore: 5, sessionStart: Date.now(), themeMode: 'dark'
+    };
+
+    /* ═══════════════════════════════════════════════════════════
+       THEME SYSTEM
+    ═══════════════════════════════════════════════════════════ */
+    let themeAutoInterval;
+    const themes = ['dark', 'light'];
+    let themeIdx = 0;
+
+    function applyTheme(mode) {
+      document.body.classList.remove('theme-light', 'theme-dark');
+      if (mode === 'light') {
+        document.body.classList.add('theme-light');
+        document.getElementById('theme-icon').textContent = '🌙';
+        document.getElementById('theme-label').textContent = 'Modo Escuro';
+      } else {
+        document.getElementById('theme-icon').textContent = '☀️';
+        document.getElementById('theme-label').textContent = 'Modo Claro';
+      }
+      state.themeMode = mode;
+      save();
     }
 
-    function refreshAll() { updateTopStats(); renderQueue(); renderMatch(); renderRanking(); renderHistory(); }
-    function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); updateTopStats(); }
+    function toggleTheme() {
+      applyTheme(state.themeMode === 'dark' ? 'light' : 'dark');
+      // reset auto-cycle timer
+      clearInterval(themeAutoInterval);
+      startThemeAutoCycle();
+    }
 
+    function startThemeAutoCycle() {
+      // auto switch theme every 2 minutes
+      themeAutoInterval = setInterval(() => {
+        applyTheme(state.themeMode === 'dark' ? 'light' : 'dark');
+      }, 2 * 60 * 1000);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       CLOCK & SESSION TIMER
+    ═══════════════════════════════════════════════════════════ */
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent =
+        now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('date-badge').textContent =
+        now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+      // session timer
+      const elapsed = Math.floor((Date.now() - (state.sessionStart || Date.now())) / 1000);
+      const h = Math.floor(elapsed / 3600);
+      const m = Math.floor((elapsed % 3600) / 60);
+      const s = elapsed % 60;
+      const parts = h > 0 ? `${h}h ${m}m` : m > 0 ? `${m}m ${s}s` : `${s}s`;
+      const el = document.getElementById('session-timer');
+      if (el) el.innerHTML = `Sessão ativa: <span>${parts}</span>`;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SCORE SELECTOR
+    ═══════════════════════════════════════════════════════════ */
+    function setScore(n) {
+      WINNING_SCORE = n;
+      state.winScore = n;
+      syncScoreUI();
+      save(); renderMatch();
+    }
+
+    function syncScoreUI() {
+      const n = state.winScore || 5;
+      WINNING_SCORE = n;
+      ['mob', 'side'].forEach(src => {
+        document.querySelectorAll(`input[name="score-${src}"]`).forEach(r => {
+          r.checked = (parseInt(r.value) === n);
+        });
+      });
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       INIT
+    ═══════════════════════════════════════════════════════════ */
+    function init() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        state = JSON.parse(saved);
+        if (!state.allPlayers) state.allPlayers = [...state.queue];
+        if (!state.sessionStart) state.sessionStart = Date.now();
+      }
+      applyTheme(state.themeMode || 'dark');
+      startThemeAutoCycle();
+      syncScoreUI();
+      updateClock();
+      setInterval(updateClock, 1000);
+      refreshAll();
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+    }
+
+    function refreshAll() {
+      updateTopStats();
+      renderQueue();
+      renderMatch();
+      renderRanking();
+      renderHistory();
+      updateFooterStats();
+    }
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      updateTopStats();
+      updateFooterStats();
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       TOP STATS
+    ═══════════════════════════════════════════════════════════ */
     function updateTopStats() {
       const players = Object.keys(state.ranking);
       document.getElementById('ts-partidas').textContent = state.history.length;
       document.getElementById('ts-jogadores').textContent = players.length;
+      document.getElementById('ts-na-fila').textContent = state.queue.length;
+
       if (players.length > 0) {
-        const sorted = players.sort((a,b) => (state.ranking[b].w / (state.ranking[b].w + state.ranking[b].d || 1)) - (state.ranking[a].w / (state.ranking[a].w + state.ranking[a].d || 1)));
-        document.getElementById('ts-lider').textContent = sorted[0];
-      } else { document.getElementById('ts-lider').textContent = "—"; }
+        const sortedByRate = [...players].sort((a, b) => {
+          const rA = state.ranking[a].w / ((state.ranking[a].w + state.ranking[a].d) || 1);
+          const rB = state.ranking[b].w / ((state.ranking[b].w + state.ranking[b].d) || 1);
+          return rB - rA;
+        });
+        const lider = sortedByRate[0];
+        document.getElementById('ts-lider').textContent = lider + ' (' + state.ranking[lider].w + 'V)';
+      } else {
+        document.getElementById('ts-lider').textContent = '—';
+      }
     }
 
-    function resetDay() { if(confirm("Deseja apagar todos os dados e começar do zero?")) { state = { queue: [], match: null, ranking: {}, history: [], lastState: null }; save(); refreshAll(); } }
-    
-    function showTab(id, btn) { 
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); 
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); 
-        document.getElementById('tab-' + id).classList.add('active'); 
-        if (btn) btn.classList.add('active'); 
-        if(id==='ranking') renderRanking(); 
-        if(id==='historico') renderHistory(); 
-        if(id==='placar') renderMatch(); 
+    /* ═══════════════════════════════════════════════════════════
+       FOOTER STATS
+    ═══════════════════════════════════════════════════════════ */
+    function updateFooterStats() {
+      document.getElementById('ft-partidas').textContent = state.history.length;
+
+      if (state.history.length > 0) {
+        // average total points per match
+        const totalPts = state.history.reduce((acc, h) => {
+          const parts = h.score.split(' x ');
+          return acc + (parseInt(parts[0]) || 0) + (parseInt(parts[1]) || 0);
+        }, 0);
+        document.getElementById('ft-media').textContent = (totalPts / state.history.length).toFixed(1);
+
+        // longest win streak
+        const wins = {};
+        let maxStreak = 0; let maxPlayer = '—'; let curStreak = 0; let curPlayer = '';
+        [...state.history].reverse().forEach(h => {
+          if (h.win === curPlayer) {
+            curStreak++;
+          } else {
+            curPlayer = h.win;
+            curStreak = 1;
+          }
+          if (!wins[h.win]) wins[h.win] = 0;
+          wins[h.win] = Math.max(wins[h.win], curStreak);
+          if (wins[h.win] > maxStreak) { maxStreak = wins[h.win]; maxPlayer = h.win; }
+        });
+        document.getElementById('ft-sequencia').textContent = maxStreak > 0 ? `${maxPlayer} (${maxStreak}x)` : '—';
+
+        // closest match (smallest point difference)
+        let minDiff = Infinity; let closestMatch = '—';
+        state.history.forEach(h => {
+          const parts = h.score.split(' x ');
+          const diff = Math.abs((parseInt(parts[0]) || 0) - (parseInt(parts[1]) || 0));
+          if (diff < minDiff) { minDiff = diff; closestMatch = h.players + ' (' + h.score + ')'; }
+        });
+        document.getElementById('ft-disputada').textContent = closestMatch;
+      } else {
+        ['ft-media', 'ft-sequencia', 'ft-disputada'].forEach(id => {
+          document.getElementById(id).textContent = '—';
+        });
+      }
     }
 
-    function addToQueue(src) { 
-        const input = document.getElementById(src === 'mob' ? 'p-input-mob' : 'p-input-side'); 
-        const name = input.value.trim().toUpperCase(); 
-        if (!name || state.queue.includes(name)) return; 
-        if (state.match && (state.match.p1 === name || state.match.p2 === name)) return;
-        state.queue.push(name); 
-        input.value = ""; 
-        save(); renderQueue(); 
+    /* ═══════════════════════════════════════════════════════════
+       TABS
+    ═══════════════════════════════════════════════════════════ */
+    function showTab(id, btn) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + id).classList.add('active');
+      if (btn) btn.classList.add('active');
+      if (id === 'ranking') renderRanking();
+      if (id === 'historico') renderHistory();
     }
 
-    function renderQueue() { 
-        const listHtml = state.queue.map((name, i) => `
-            <li class="queue-item">
-                <div class="q-num">${i + 1}</div>
-                <span class="q-name">${name}</span>
-                <button class="btn" style="padding:4px 10px; font-size:10px" onclick="removeFromQueue(${i}); event.stopPropagation();">✕</button>
-            </li>
-        `).join(''); 
-        document.getElementById('q-list-mob').innerHTML = listHtml || '<li style="text-align:center; padding:20px; color:var(--muted)">Fila vazia</li>'; 
-        document.getElementById('q-list-side').innerHTML = listHtml || '<li style="text-align:center; padding:20px; color:var(--muted)">Fila vazia</li>'; 
-        const minNeeded = state.match ? 1 : 2; 
-        document.getElementById('start-mob').style.display = (state.queue.length >= minNeeded) ? 'block' : 'none'; 
-        document.getElementById('start-side').style.display = (state.queue.length >= minNeeded) ? 'block' : 'none'; 
+    /* ═══════════════════════════════════════════════════════════
+       QUEUE
+    ═══════════════════════════════════════════════════════════ */
+    function addToQueue(src) {
+      const input = document.getElementById(src === 'mob' ? 'p-input-mob' : 'p-input-side');
+      const name = input.value.trim().toUpperCase();
+      if (!name) return;
+      if (state.queue.includes(name)) return;
+      if (state.match && (state.match.p1 === name || state.match.p2 === name)) return;
+      if (!state.allPlayers.includes(name)) state.allPlayers.push(name);
+      state.queue.push(name);
+      input.value = '';
+      save(); renderQueue();
     }
 
-    function removeFromQueue(index) { 
-        state.queue.splice(index, 1);
-        save(); 
-        renderQueue(); 
+    function removeFromQueue(index) {
+      const name = state.queue[index];
+      if (!confirm(`Remover ${name} da fila?`)) return;
+      state.queue.splice(index, 1);
+      state.allPlayers = state.allPlayers.filter(p => p !== name);
+      save(); renderQueue();
     }
 
-    function startMatch() { 
-        if (!state.match) { 
-            state.match = { p1: state.queue[0], p2: state.queue[1], s1: 0, s2: 0 }; 
-            state.queue.splice(0, 2); 
-        } else { 
-            state.match.p2 = state.queue[0]; 
-            state.match.s1 = 0; 
-            state.match.s2 = 0; 
-            state.queue.splice(0, 1); 
-        } 
-        state.lastState = null; 
-        save(); renderMatch(); 
-        showTab('placar', document.getElementById('tab-btn-placar')); 
+    function renderQueue() {
+      let fullList = [];
+      if (state.match) {
+        fullList.push({ name: state.match.p1, playing: true });
+        if (state.match.p2 !== 'Aguardando...') fullList.push({ name: state.match.p2, playing: true });
+      }
+      state.queue.forEach((name, i) => fullList.push({ name, playing: false, qIdx: i }));
+
+      const listHtml = fullList.map((item, i) => `
+        <li class="queue-item">
+          <div class="q-num ${item.playing ? 'playing' : ''}">${i + 1}</div>
+          <span class="q-name">${item.name}</span>
+          ${item.playing
+            ? `<span class="q-badge">jogando</span>`
+            : `<button class="btn danger" style="padding:6px 12px; font-size:11px" onclick="removeFromQueue(${item.qIdx})">✕ Sair</button>`
+          }
+        </li>
+      `).join('');
+
+      const emptyHtml = '<li style="text-align:center; padding:24px; color:var(--muted); font-size:14px">Fila vazia</li>';
+      ['mob', 'side'].forEach(id => {
+        document.getElementById('q-list-' + id).innerHTML = fullList.length ? listHtml : emptyHtml;
+      });
+
+      const minNeeded = state.match ? 1 : 2;
+      const canStart = state.queue.length >= minNeeded;
+      document.getElementById('start-mob').style.display = canStart ? 'block' : 'none';
+      document.getElementById('start-side').style.display = canStart ? 'block' : 'none';
+
+      // update fila stat
+      document.getElementById('ts-na-fila').textContent = state.queue.length;
     }
 
-    function renderMatch() { 
-        const nm = document.getElementById('no-match'); const ma = document.getElementById('match-active'); 
-        if (!state.match) { nm.style.display = 'block'; ma.style.display = 'none'; return; } 
-        nm.style.display = 'none'; ma.style.display = 'block'; 
-        document.getElementById('p1name').textContent = state.match.p1; 
-        document.getElementById('p2name').textContent = state.match.p2; 
-        document.getElementById('p1score').textContent = state.match.s1; 
-        document.getElementById('p2score').textContent = state.match.s2; 
-        document.getElementById('p1score').className = 'score-num' + (state.match.s1 > state.match.s2 ? ' leading' : ''); 
-        document.getElementById('p2score').className = 'score-num' + (state.match.s2 > state.match.s1 ? ' leading' : ''); 
+    /* ═══════════════════════════════════════════════════════════
+       MATCH
+    ═══════════════════════════════════════════════════════════ */
+    function startMatch() {
+      if (!state.match) {
+        if (state.queue.length < 2) return;
+        state.match = { p1: state.queue[0], p2: state.queue[1], s1: 0, s2: 0 };
+        state.queue.splice(0, 2);
+      } else {
+        if (state.queue.length < 1) return;
+        state.match.p2 = state.queue[0];
+        state.match.s1 = 0; state.match.s2 = 0;
+        state.queue.splice(0, 1);
+      }
+      state.lastState = null;
+      save(); renderMatch(); renderQueue();
+      showTab('placar', document.getElementById('tab-btn-placar'));
     }
 
-    function handlePoint(playerIndex) { 
-        if (!state.match) return; 
-        state.lastState = JSON.parse(JSON.stringify(state.match)); 
-        if (playerIndex === 0) { state.match.s1++; animate('p1score'); } 
-        else { state.match.s2++; animate('p2score'); } 
-        if (state.match.s1 >= WINNING_SCORE || state.match.s2 >= WINNING_SCORE) finishMatch(); 
-        else { save(); renderMatch(); } 
+    function renderMatch() {
+      const noMatch = document.getElementById('no-match');
+      const active = document.getElementById('match-active');
+      if (!state.match) { noMatch.style.display = 'block'; active.style.display = 'none'; return; }
+      noMatch.style.display = 'none'; active.style.display = 'block';
+
+      document.getElementById('p1name').textContent = state.match.p1;
+      document.getElementById('p2name').textContent = state.match.p2;
+      document.getElementById('p1score').textContent = state.match.s1;
+      document.getElementById('p2score').textContent = state.match.s2;
+      document.getElementById('p1score').className = 'score-num' + (state.match.s1 > state.match.s2 ? ' leading' : '');
+      document.getElementById('p2score').className = 'score-num' + (state.match.s2 > state.match.s1 ? ' leading' : '');
+
+      const ws = WINNING_SCORE;
+      document.getElementById('prog-wrap').innerHTML =
+        Array.from({length: ws}, (_, i) => `<div class="prog-dot ${i < state.match.s1 ? 'p1' : ''}"></div>`).join('') +
+        '<div style="width:24px"></div>' +
+        Array.from({length: ws}, (_, i) => `<div class="prog-dot ${i < state.match.s2 ? 'p2' : ''}"></div>`).join('');
+
+      const hint = document.getElementById('rotation-hint');
+      hint.innerHTML = state.queue.length > 0
+        ? `🔄 Próximo na fila: <span>${state.queue[0]}</span>`
+        : '';
     }
 
-    function undo() { if (state.lastState) { state.match = JSON.parse(JSON.stringify(state.lastState)); state.lastState = null; save(); renderMatch(); } }
-    function animate(id) { const el = document.getElementById(id); el.classList.remove('point-anim'); void el.offsetWidth; el.classList.add('point-anim'); }
-
-    function finishMatch() { 
-        const m = state.match; const winner = m.s1 > m.s2 ? m.p1 : m.p2; const loser = m.s1 > m.s2 ? m.p2 : m.p1; 
-        state.history.unshift({ win: winner, score: `${m.s1} x ${m.s2}`, players: `${m.p1} vs ${m.p2}`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }); 
-        if (!state.ranking[winner]) state.ranking[winner] = { w: 0, d: 0 }; 
-        if (!state.ranking[loser]) state.ranking[loser] = { w: 0, d: 0 }; 
-        state.ranking[winner].w++; state.ranking[loser].d++; 
-        state.match = { p1: winner, p2: "Aguardando...", s1: 0, s2: 0 }; 
-        save(); 
-        document.getElementById('win-name').textContent = winner; 
-        document.getElementById('win-score').textContent = `Vitória final por ${m.s1} a ${m.s2}`; 
-        document.getElementById('winner-modal').style.display = 'block'; 
-        document.getElementById('overlay').style.display = 'block'; 
+    function handlePoint(playerIndex) {
+      if (!state.match) return;
+      state.lastState = JSON.parse(JSON.stringify(state.match));
+      if (playerIndex === 0) { state.match.s1++; animate('p1score'); }
+      else { state.match.s2++; animate('p2score'); }
+      if (state.match.s1 >= WINNING_SCORE || state.match.s2 >= WINNING_SCORE) finishMatch();
+      else { save(); renderMatch(); }
     }
 
-    function closeWinner() { 
-        document.getElementById('winner-modal').style.display = 'none'; 
-        document.getElementById('overlay').style.display = 'none'; 
-        if (state.queue.length > 0) startMatch(); else renderMatch();
+    function undo() {
+      if (state.lastState) {
+        state.match = JSON.parse(JSON.stringify(state.lastState));
+        state.lastState = null; save(); renderMatch();
+      }
     }
 
-    function cancelMatch() { if (confirm("Cancelar partida?")) { state.match = null; save(); renderMatch(); renderQueue(); } }
-
-    function removePlayer(name) { 
-        if (confirm(`Excluir ${name}?`)) { 
-            delete state.ranking[name]; 
-            state.queue = state.queue.filter(p => p !== name); 
-            if (state.match && (state.match.p1 === name || state.match.p2 === name)) state.match = null; 
-            save(); refreshAll(); 
-        } 
+    function animate(id) {
+      const el = document.getElementById(id);
+      el.classList.remove('point-anim');
+      void el.offsetWidth;
+      el.classList.add('point-anim');
     }
 
-    function renderRanking() { 
-        const players = Object.keys(state.ranking); 
-        const sorted = players.sort((a,b) => (state.ranking[b].w / (state.ranking[b].w + state.ranking[b].d || 1)) - (state.ranking[a].w / (state.ranking[a].w + state.ranking[a].d || 1)) || state.ranking[b].w - state.ranking[a].w); 
-        document.getElementById('rank-body').innerHTML = sorted.map((name, i) => { 
-            const r = state.ranking[name]; const rate = Math.round((r.w / (r.w + r.d || 1)) * 100); 
-            return `<tr><td>${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}</td><td><b>${name}</b></td><td>${r.w}V - ${r.d}D</td><td style="color:${rate >= 50 ? 'var(--primary)' : 'var(--red)'}">${rate}%</td><td><button class="btn danger" style="padding:4px 8px; font-size:10px" onclick="removePlayer('${name}')">✕</button></td></tr>`; 
-        }).join('') || '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--muted)">Sem dados</td></tr>'; 
+    function finishMatch() {
+      const m = state.match;
+      const winner = m.s1 > m.s2 ? m.p1 : m.p2;
+      const loser  = m.s1 > m.s2 ? m.p2 : m.p1;
+
+      state.history.unshift({
+        win: winner,
+        score: `${m.s1} x ${m.s2}`,
+        players: `${m.p1} vs ${m.p2}`,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+
+      if (!state.ranking[winner]) state.ranking[winner] = { w: 0, d: 0 };
+      if (!state.ranking[loser])  state.ranking[loser]  = { w: 0, d: 0 };
+      state.ranking[winner].w++;
+      state.ranking[loser].d++;
+
+      state.queue.push(loser);
+      state.match = { p1: winner, p2: 'Aguardando...', s1: 0, s2: 0 };
+      save();
+
+      document.getElementById('win-name').textContent = winner;
+      document.getElementById('win-score').textContent = `Placar final: ${m.s1} a ${m.s2}`;
+      document.getElementById('win-next').textContent =
+        state.queue.length > 0 ? `Próximo desafiante: ${state.queue[0]}` : 'Sem jogadores na fila';
+      document.getElementById('winner-modal').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+      modalOpen = true;
+      launchConfetti();
     }
 
-    function renderHistory() { document.getElementById('hist-list').innerHTML = state.history.map(h => `<div style="padding:15px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center"><div><div style="font-size:11px; color:var(--muted); margin-bottom:4px">${h.time}</div><div style="font-size:14px; font-weight:600">${h.players}</div><div style="font-size:11px; color:var(--primary)">🏆 ${h.win}</div></div><div style="font-family:'Bebas Neue'; font-size:26px">${h.score}</div></div>`).join('') || '<div style="text-align:center; padding:20px; color:var(--muted)">Vazio</div>'; }
-    
+    function closeWinner() {
+      document.getElementById('winner-modal').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+      modalOpen = false;
+      stopConfetti();
+      if (state.queue.length > 0) startMatch();
+      else { renderMatch(); renderQueue(); }
+    }
+
+    function cancelMatch() {
+      if (confirm('Cancelar partida? Os jogadores voltam à fila.')) {
+        const p1 = state.match.p1;
+        const p2 = state.match.p2;
+        if (p2 !== 'Aguardando...') state.queue.unshift(p2);
+        state.queue.unshift(p1);
+        state.match = null;
+        save(); renderMatch(); renderQueue();
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       PLAYERS
+    ═══════════════════════════════════════════════════════════ */
+    function removePlayer(name) {
+      if (confirm(`Excluir ${name} completamente?`)) {
+        delete state.ranking[name];
+        state.queue = state.queue.filter(p => p !== name);
+        state.allPlayers = state.allPlayers.filter(p => p !== name);
+        if (state.match && (state.match.p1 === name || state.match.p2 === name)) state.match = null;
+        save(); refreshAll();
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       RESET
+    ═══════════════════════════════════════════════════════════ */
+    function resetDay() {
+      if (confirm('Resetar tudo?')) {
+        state = {
+          allPlayers: [], queue: [], match: null,
+          ranking: {}, history: [], lastState: null,
+          winScore: 5, sessionStart: Date.now(),
+          themeMode: state.themeMode
+        };
+        localStorage.removeItem(STORAGE_KEY);
+        syncScoreUI();
+        refreshAll();
+        showTab('fila', document.querySelector('.tab-fila-btn'));
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       RANKING
+    ═══════════════════════════════════════════════════════════ */
+    function renderRanking() {
+      const players = Object.keys(state.ranking);
+      const sorted = players.sort((a, b) => {
+        const rA = state.ranking[a].w / ((state.ranking[a].w + state.ranking[a].d) || 1);
+        const rB = state.ranking[b].w / ((state.ranking[b].w + state.ranking[b].d) || 1);
+        return rB - rA || state.ranking[b].w - state.ranking[a].w;
+      });
+      document.getElementById('rank-body').innerHTML = sorted.map((name, i) => {
+        const r = state.ranking[name];
+        const rate = Math.round((r.w / ((r.w + r.d) || 1)) * 100);
+        return `<tr>
+          <td>${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}</td>
+          <td><b>${name}</b></td>
+          <td>${r.w}V — ${r.d}D</td>
+          <td style="color:${rate >= 50 ? 'var(--primary)' : 'var(--red)'}; font-weight:700">${rate}%</td>
+          <td><button class="btn danger" style="padding:6px 12px; font-size:11px" onclick="removePlayer('${name}')">Excluir</button></td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="5" style="text-align:center; padding:24px; color:var(--muted)">Sem dados ainda</td></tr>';
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       HISTORY
+    ═══════════════════════════════════════════════════════════ */
+    function renderHistory() {
+      document.getElementById('hist-list').innerHTML = state.history.map((h, i) => `
+        <div style="padding:16px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center">
+          <div>
+            <div style="font-size:11px; color:var(--muted); margin-bottom:3px">#${state.history.length - i} · ${h.time}</div>
+            <div style="font-size:15px; font-weight:600">${h.players}</div>
+            <div style="font-size:12px; color:var(--primary); margin-top:3px">🏆 ${h.win}</div>
+          </div>
+          <div style="font-family:'Bebas Neue'; font-size:30px; color:var(--text)">${h.score}</div>
+        </div>
+      `).join('') || '<div style="text-align:center; padding:24px; color:var(--muted)">Nenhuma partida ainda</div>';
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       INIT
+    ═══════════════════════════════════════════════════════════ */
     init();
+
+    /* ═══════════════════════════════════════════════════════════
+       KEYBOARD SHORTCUTS
+    ═══════════════════════════════════════════════════════════ */
+    let modalOpen = false;
+    document.addEventListener('keydown', function(e) {
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+      if (e.key === '1' && state.match && !modalOpen) handlePoint(0);
+      else if (e.key === '2' && state.match && !modalOpen) handlePoint(1);
+      else if (e.key === 'Enter' && modalOpen) closeWinner();
+    });
+
+    /* ═══════════════════════════════════════════════════════════
+       CONFETTI
+    ═══════════════════════════════════════════════════════════ */
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [], confettiActive = false, confettiFrame;
+    const COLORS = ['#ff9800','#ffcc02','#ff5252','#7c7cf5','#00e5ff','#69f0ae','#ffffff'];
+
+    function launchConfetti() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.style.display = 'block';
+      confettiActive = true;
+      particles = [];
+      for (let i = 0; i < 200; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: -10 - Math.random() * 300,
+          w: 8 + Math.random() * 10, h: 4 + Math.random() * 7,
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+          vx: (Math.random() - 0.5) * 5,
+          vy: 2 + Math.random() * 5,
+          angle: Math.random() * Math.PI * 2,
+          spin: (Math.random() - 0.5) * 0.25,
+          alpha: 1
+        });
+      }
+      confettiLoop();
+      setTimeout(stopConfetti, 4000);
+    }
+
+    function confettiLoop() {
+      if (!confettiActive) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.angle += p.spin; p.vy += 0.09;
+        if (p.y > canvas.height * 0.65) p.alpha -= 0.022;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctx.restore();
+      });
+      particles = particles.filter(p => p.alpha > 0);
+      if (particles.length > 0) confettiFrame = requestAnimationFrame(confettiLoop);
+      else stopConfetti();
+    }
+
+    function stopConfetti() {
+      confettiActive = false;
+      cancelAnimationFrame(confettiFrame);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.style.display = 'none';
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       PING PONG TRIVIA
+    ═══════════════════════════════════════════════════════════ */
+    const TRIVIA = ['O ping pong foi inventado na Inglaterra no final do século XIX como entretenimento de salão.', 'A bola de ping pong viaja a até 112 km/h em um saque profissional.', 'O tênis de mesa é o esporte com mais praticantes no mundo, cerca de 300 milhões.', 'Em 1971, o ping pong ajudou na diplomacia entre EUA e China.', 'A bola oficial tem 40mm e pesa 2,7 gramas.', 'Ma Long é o único a conquistar todos os títulos mundiais e olímpicos simultaneamente.', 'O tênis de mesa virou esporte olímpico em 1988.', 'O recorde de troca de bolas sem parar dura mais de 8 horas.', 'O saque precisa subir pelo menos 16cm após ser lançado para ser válido.', 'A raquete deve ter obrigatoriamente um lado preto e outro vermelho.', 'Originalmente, as raquetes eram feitas de rolhas de vinho ou caixas de charuto.', 'O ponto mais longo da história durou 2 horas e 12 minutos em uma única troca.'];
+    let triviaIdx = Math.floor(Math.random() * TRIVIA.length);
+
+    function showTrivia() {
+      const el = document.getElementById('trivia-text');
+      el.classList.remove('visible');
+      setTimeout(() => {
+        el.textContent = TRIVIA[triviaIdx];
+        triviaIdx = (triviaIdx + 1) % TRIVIA.length;
+        el.classList.add('visible');
+      }, 600);
+    }
+
+    showTrivia();
+    setInterval(showTrivia, 18000); // rotate every 18s
   </script>
 </body>
 </html>
