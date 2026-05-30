@@ -846,7 +846,7 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       let fullList = [];
       if (state.match) {
         fullList.push({ name: state.match.p1, playing: true });
-        if (state.match.p2 !== 'Aguardando...') fullList.push({ name: state.match.p2, playing: true });
+        fullList.push({ name: state.match.p2, playing: true });
       }
       state.queue.forEach((name, i) => fullList.push({ name, playing: false, qIdx: i }));
 
@@ -866,8 +866,7 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
         document.getElementById('q-list-' + id).innerHTML = fullList.length ? listHtml : emptyHtml;
       });
 
-      const minNeeded = state.match ? 1 : 2;
-      const canStart = state.queue.length >= minNeeded;
+      const canStart = !state.match && state.queue.length >= 2;
       document.getElementById('start-mob').style.display = canStart ? 'block' : 'none';
       document.getElementById('start-side').style.display = canStart ? 'block' : 'none';
 
@@ -879,16 +878,9 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
        MATCH
     ═══════════════════════════════════════════════════════════ */
     function startMatch() {
-      if (!state.match) {
-        if (state.queue.length < 2) return;
-        state.match = { p1: state.queue[0], p2: state.queue[1], s1: 0, s2: 0 };
-        state.queue.splice(0, 2);
-      } else {
-        if (state.queue.length < 1) return;
-        state.match.p2 = state.queue[0];
-        state.match.s1 = 0; state.match.s2 = 0;
-        state.queue.splice(0, 1);
-      }
+      if (state.queue.length < 2) return;
+      state.match = { p1: state.queue[0], p2: state.queue[1], s1: 0, s2: 0 };
+      state.queue.splice(0, 2);
       state.lastState = null;
       save(); renderMatch(); renderQueue();
       showTab('placar', document.getElementById('tab-btn-placar'));
@@ -959,14 +951,22 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       state.ranking[winner].w++;
       state.ranking[loser].d++;
 
+      // Rotation: winner goes to FRONT of queue, loser to BACK.
+      // Match is cleared — startMatch will pick the next two from the queue.
       state.queue.push(loser);
-      state.match = { p1: winner, p2: 'Aguardando...', s1: 0, s2: 0 };
+      state.queue.unshift(winner);
+      state.match = null;
       save();
 
+      // Next two in queue after rotation
+      const nextP1 = state.queue[0] || '—';
+      const nextP2 = state.queue[1] || '—';
       document.getElementById('win-name').textContent = winner;
       document.getElementById('win-score').textContent = `Placar final: ${m.s1} a ${m.s2}`;
       document.getElementById('win-next').textContent =
-        state.queue.length > 0 ? `Próximo desafiante: ${state.queue[0]}` : 'Sem jogadores na fila';
+        state.queue.length >= 2
+          ? `Próxima partida: ${nextP1} vs ${nextP2}`
+          : state.queue.length === 1 ? `Aguardando mais jogadores...` : 'Sem jogadores na fila';
       document.getElementById('winner-modal').style.display = 'block';
       document.getElementById('overlay').style.display = 'block';
       modalOpen = true;
@@ -978,16 +978,15 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       document.getElementById('overlay').style.display = 'none';
       modalOpen = false;
       stopConfetti();
-      if (state.queue.length > 0) startMatch();
+      // Now just start normally from the queue — all players are already in it
+      if (state.queue.length >= 2) startMatch();
       else { renderMatch(); renderQueue(); }
     }
 
     function cancelMatch() {
       if (confirm('Cancelar partida? Os jogadores voltam à fila.')) {
-        const p1 = state.match.p1;
-        const p2 = state.match.p2;
-        if (p2 !== 'Aguardando...') state.queue.unshift(p2);
-        state.queue.unshift(p1);
+        state.queue.unshift(state.match.p2);
+        state.queue.unshift(state.match.p1);
         state.match = null;
         save(); renderMatch(); renderQueue();
       }
