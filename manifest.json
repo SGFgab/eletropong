@@ -1,15 +1,18 @@
 {
-  "name": "PingPong Pro Dashboard",
-  "short_name": "PingPong",
-  "start_url": "index.html",
+  "name": "ELT TT Tournament",
+  "short_name": "Eletropong",
+  "description": "Gerenciador e marcador de torneios de Tênis de Mesa.",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0e0e0e",
   "theme_color": "#ff9800",
+  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1041/1041168.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3565/3565814.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
