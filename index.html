@@ -46,7 +46,6 @@
       -webkit-tap-highlight-color: transparent;
       transition: background-color 1.2s ease, border-color 1.2s ease, color 1.2s ease;
     }
-    /* override transition for animations that need to be instant */
     .point-anim, .prog-dot, .score-num, .tab, .btn { transition: background-color 1.2s ease, border-color 1.2s ease, color 1.2s ease, transform 0.1s ease; }
 
     body {
@@ -57,7 +56,7 @@
     /* ── HEADER ─────────────────────────────────────────────── */
     header { background: var(--surface); border-bottom: 2px solid var(--border); padding: 0.5rem 1.5rem; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px var(--shadow); }
     .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 3px; color: var(--primary); white-space: nowrap; }
-#ts-lider { animation: pulse 2s infinite; } @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+    #ts-lider { animation: pulse 2s infinite; } @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
     .header-center {
       flex: 1;
       display: flex;
@@ -167,9 +166,9 @@
 
     /* ── INPUTS & BUTTONS ───────────────────────────────────── */
     .input-row { display: flex; gap: 8px; margin-bottom: 1rem; align-items: center; width: 100%; }
-input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); color: var(--text); padding: 8px 12px; font-size: 15px; outline: none; font-family: 'DM Sans', sans-serif; height: 44px; }
     input[type=text] {
       flex: 1;
+      min-width: 0;
       background: var(--surface2);
       border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
@@ -242,7 +241,7 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       margin-bottom: 6px;
     }
     .score-num { font-family: 'Bebas Neue', sans-serif; font-size: 100px; line-height: 1; color: var(--primary); margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-.score-num.leading { color: #ffffff; text-shadow: 0 0 15px var(--primary); }
+    .score-num.leading { color: #ffffff; text-shadow: 0 0 15px var(--primary); }
     .vs-badge {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 28px;
@@ -338,7 +337,7 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       background: rgba(0,0,0,0.8);
       z-index: 200; backdrop-filter: blur(6px);
     }
-    .winner-modal {
+    .winner-modal, .qr-modal {
       display: none; position: fixed;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
@@ -362,13 +361,23 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       letter-spacing: 2px;
       margin-bottom: 6px;
     }
+    
+    /* ── QR CODE FRAME ──────────────────────────────────────── */
+    .qr-frame {
+      background: #ffffff;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      margin: 1.5rem 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .qr-frame img { display: block; max-width: 100%; height: auto; }
 
     /* ── CONFETTI ───────────────────────────────────────────── */
     #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 202; display: none; }
 
     /* ── FOOTER ─────────────────────────────────────────────── */
     footer { margin-top: 0.5rem; padding: 0.5rem 1.5rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-.footer-trivia { width: 100%; border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.5rem; display: flex; align-items: baseline; gap: 8px; }
     .footer-stats {
       display: flex;
       gap: 2rem;
@@ -437,6 +446,9 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
         <span id="theme-icon">☀️</span>
         <span id="theme-label">Modo Claro</span>
       </button>
+      <button class="theme-toggle-btn" onclick="openQRModal()" style="border-color: var(--primary); color: var(--primary)">
+        <span>📱</span><span>Compartilhar</span>
+      </button>
     </div>
     <div class="header-right">
       <div id="clock">00:00:00</div>
@@ -445,7 +457,6 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
   </header>
 
   <div class="container">
-    <!-- TOP STATS -->
     <div class="top-stats">
       <div class="metric">
         <div class="metric-val" id="ts-partidas">0</div>
@@ -474,7 +485,6 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
           <button class="tab" onclick="showTab('historico',this)">📜 Histórico</button>
         </div>
 
-        <!-- TAB FILA (mobile/tablet) -->
         <div id="tab-fila" class="section">
           <div class="card">
             <div class="card-title">Adicionar Jogador</div>
@@ -495,7 +505,6 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
           </div>
         </div>
 
-        <!-- TAB PARTIDA -->
         <div id="tab-placar" class="section active">
           <div id="no-match" class="card" style="text-align:center; padding: 5rem 1rem; color: var(--muted);">
             <div style="font-size: 48px; margin-bottom: 12px">🏓</div>
@@ -532,9 +541,11 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
           </div>
         </div>
 
-        <!-- TAB RANKING -->
         <div id="tab-ranking" class="section">
           <div class="card">
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
+              <button class="btn primary" onclick="exportRankingText()">📥 Exportar Ranking (.txt)</button>
+            </div>
             <table class="rank-table">
               <thead>
                 <tr>
@@ -546,13 +557,11 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
           </div>
         </div>
 
-        <!-- TAB HISTÓRICO -->
         <div id="tab-historico" class="section">
           <div class="card" id="hist-list"></div>
         </div>
       </main>
 
-      <!-- SIDEBAR -->
       <aside class="sidebar-queue">
         <div class="card" style="position:sticky; top:90px;">
           <div class="card-title">Fila de Espera</div>
@@ -575,7 +584,6 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       </aside>
     </div>
 
-    <!-- FOOTER -->
     <footer>
       <div class="footer-stats">
         <div class="footer-stat">
@@ -606,7 +614,6 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
     </footer>
   </div>
 
-  <!-- MODAL VENCEDOR -->
   <div class="overlay" id="overlay"></div>
   <div class="winner-modal" id="winner-modal">
     <div class="winner-trophy">🏆</div>
@@ -617,6 +624,13 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       Próxima Partida ▶ &nbsp;
       <span class="key-hint" style="background:rgba(0,0,0,0.15);border-color:rgba(0,0,0,0.2);color:var(--primary-text)">Enter</span>
     </button>
+  </div>
+
+  <div class="winner-modal" id="qr-modal" style="padding: 2rem 2rem;">
+    <div style="font-family: 'Bebas Neue'; font-size: 28px; color: var(--primary); letter-spacing: 1.5px;">Escanear Torneio</div>
+    <div style="font-size: 13px; color: var(--muted); margin-top: 4px;">Abra a câmera do celular para entrar na fila!</div>
+    <div class="qr-frame" id="qr-frame-target"></div>
+    <button class="btn full" onclick="closeQRModal()">Fechar</button>
   </div>
 
   <script>
@@ -630,6 +644,41 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       ranking: {}, history: [], lastState: null,
       winScore: 5, sessionStart: Date.now(), themeMode: 'dark'
     };
+
+    /* ═══════════════════════════════════════════════════════════
+       AUDIO SYNTHESIS SYSTEM (NATIVE BOUNCES)
+    ═══════════════════════════════════════════════════════════ */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'point') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+      } else if (type === 'victory') {
+        const now = audioCtx.currentTime;
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(554, now + 0.1);
+        osc.frequency.setValueAtTime(659, now + 0.2);
+        osc.frequency.setValueAtTime(880, now + 0.3);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+        osc.start();
+        osc.stop(now + 0.6);
+      }
+    }
 
     /* ═══════════════════════════════════════════════════════════
        THEME SYSTEM
@@ -654,13 +703,11 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
 
     function toggleTheme() {
       applyTheme(state.themeMode === 'dark' ? 'light' : 'dark');
-      // reset auto-cycle timer
       clearInterval(themeAutoInterval);
       startThemeAutoCycle();
     }
 
     function startThemeAutoCycle() {
-      // auto switch theme every 2 minutes
       themeAutoInterval = setInterval(() => {
         applyTheme(state.themeMode === 'dark' ? 'light' : 'dark');
       }, 2 * 60 * 1000);
@@ -676,7 +723,6 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       document.getElementById('date-badge').textContent =
         now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
 
-      // session timer
       const elapsed = Math.floor((Date.now() - (state.sessionStart || Date.now())) / 1000);
       const h = Math.floor(elapsed / 3600);
       const m = Math.floor((elapsed % 3600) / 60);
@@ -704,6 +750,65 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
           r.checked = (parseInt(r.value) === n);
         });
       });
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       FEATURE: QR CODE MODAL GENERATOR
+    ═══════════════════════════════════════════════════════════ */
+    function openQRModal() {
+      const currentUrl = window.location.href;
+      // Usando API pública de geração de QR Code limpa e reativa
+      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(currentUrl)}`;
+      
+      document.getElementById('qr-frame-target').innerHTML = `<img src="${qrApiUrl}" alt="QR Code do App">`;
+      document.getElementById('qr-modal').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+      modalOpen = true;
+    }
+
+    function closeQRModal() {
+      document.getElementById('qr-modal').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+      modalOpen = false;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       FEATURE: EXPORT RANKING AS .TXT FILE
+    ═══════════════════════════════════════════════════════════ */
+    function exportRankingText() {
+      const players = Object.keys(state.ranking);
+      if (players.length === 0) {
+        alert("Sem dados de ranking para exportar ainda!");
+        return;
+      }
+      
+      const sorted = players.sort((a, b) => {
+        const rA = state.ranking[a].w / ((state.ranking[a].w + state.ranking[a].d) || 1);
+        const rB = state.ranking[b].w / ((state.ranking[b].w + state.ranking[b].d) || 1);
+        return rB - rA || state.ranking[b].w - state.ranking[a].w;
+      });
+
+      let txtContent = `🏓 ELT TT TOURNAMENT - RANKING DO DIA 🏓\n`;
+      txtContent += `Data: ${new Date().toLocaleDateString('pt-BR')} | Partidas Totais: ${state.history.length}\n`;
+      txtContent += `==================================================\n\n`;
+
+      sorted.forEach((name, i) => {
+        const r = state.ranking[name];
+        const rate = Math.round((r.w / ((r.w + r.d) || 1)) * 100);
+        txtContent += `${i + 1}º Place: ${name} -> ${r.w}V — ${r.d}D (Aproveitamento: ${rate}%)\n`;
+      });
+
+      txtContent += `\n==================================================\n`;
+      txtContent += `Gerado automaticamente pelo Eletropong. Bora pra próxima!`;
+
+      // Criação nativa do arquivo para download imediato
+      const blob = new Blob([txtContent], { type: "text/plain;charset=utf-8" });
+      const tempLink = document.createElement("a");
+      tempLink.href = URL.createObjectURL(blob);
+      tempLink.download = `ranking_eletropong_${new Date().toISOString().slice(0,10)}.txt`;
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      document.body.removeChild(tempLink);
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -769,14 +874,12 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       document.getElementById('ft-partidas').textContent = state.history.length;
 
       if (state.history.length > 0) {
-        // average total points per match
         const totalPts = state.history.reduce((acc, h) => {
           const parts = h.score.split(' x ');
           return acc + (parseInt(parts[0]) || 0) + (parseInt(parts[1]) || 0);
         }, 0);
         document.getElementById('ft-media').textContent = (totalPts / state.history.length).toFixed(1);
 
-        // longest win streak
         const wins = {};
         let maxStreak = 0; let maxPlayer = '—'; let curStreak = 0; let curPlayer = '';
         [...state.history].reverse().forEach(h => {
@@ -792,7 +895,6 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
         });
         document.getElementById('ft-sequencia').textContent = maxStreak > 0 ? `${maxPlayer} (${maxStreak}x)` : '—';
 
-        // closest match (smallest point difference)
         let minDiff = Infinity; let closestMatch = '—';
         state.history.forEach(h => {
           const parts = h.score.split(' x ');
@@ -870,12 +972,11 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       document.getElementById('start-mob').style.display = canStart ? 'block' : 'none';
       document.getElementById('start-side').style.display = canStart ? 'block' : 'none';
 
-      // update fila stat
       document.getElementById('ts-na-fila').textContent = state.queue.length;
     }
 
     /* ═══════════════════════════════════════════════════════════
-       MATCH
+       MATCH (LOGIC WITH 2-POINT ADVANTAGE RULE / DEUCE)
     ═══════════════════════════════════════════════════════════ */
     function startMatch() {
       if (state.queue.length < 2) return;
@@ -899,11 +1000,11 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       document.getElementById('p1score').className = 'score-num' + (state.match.s1 > state.match.s2 ? ' leading' : '');
       document.getElementById('p2score').className = 'score-num' + (state.match.s2 > state.match.s1 ? ' leading' : '');
 
-      const ws = WINNING_SCORE;
+      const maxCurrentScore = Math.max(state.match.s1, state.match.s2, WINNING_SCORE);
       document.getElementById('prog-wrap').innerHTML =
-        Array.from({length: ws}, (_, i) => `<div class="prog-dot ${i < state.match.s1 ? 'p1' : ''}"></div>`).join('') +
+        Array.from({length: maxCurrentScore}, (_, i) => `<div class="prog-dot ${i < state.match.s1 ? 'p1' : ''}"></div>`).join('') +
         '<div style="width:24px"></div>' +
-        Array.from({length: ws}, (_, i) => `<div class="prog-dot ${i < state.match.s2 ? 'p2' : ''}"></div>`).join('');
+        Array.from({length: maxCurrentScore}, (_, i) => `<div class="prog-dot ${i < state.match.s2 ? 'p2' : ''}"></div>`).join('');
 
       const hint = document.getElementById('rotation-hint');
       hint.innerHTML = state.queue.length > 0
@@ -914,10 +1015,22 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
     function handlePoint(playerIndex) {
       if (!state.match) return;
       state.lastState = JSON.parse(JSON.stringify(state.match));
+      
       if (playerIndex === 0) { state.match.s1++; animate('p1score'); }
       else { state.match.s2++; animate('p2score'); }
-      if (state.match.s1 >= WINNING_SCORE || state.match.s2 >= WINNING_SCORE) finishMatch();
-      else { save(); renderMatch(); }
+
+      playSound('point');
+
+      const s1 = state.match.s1;
+      const s2 = state.match.s2;
+      const target = WINNING_SCORE;
+
+      if ((s1 >= target || s2 >= target) && Math.abs(s1 - s2) >= 2) {
+        finishMatch();
+      } else { 
+        save(); 
+        renderMatch(); 
+      }
     }
 
     function undo() {
@@ -939,6 +1052,8 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       const winner = m.s1 > m.s2 ? m.p1 : m.p2;
       const loser  = m.s1 > m.s2 ? m.p2 : m.p1;
 
+      playSound('victory');
+
       state.history.unshift({
         win: winner,
         score: `${m.s1} x ${m.s2}`,
@@ -951,14 +1066,11 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       state.ranking[winner].w++;
       state.ranking[loser].d++;
 
-      // Rotation: winner goes to FRONT of queue, loser to BACK.
-      // Match is cleared — startMatch will pick the next two from the queue.
       state.queue.push(loser);
       state.queue.unshift(winner);
       state.match = null;
       save();
 
-      // Next two in queue after rotation
       const nextP1 = state.queue[0] || '—';
       const nextP2 = state.queue[1] || '—';
       document.getElementById('win-name').textContent = winner;
@@ -978,7 +1090,6 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       document.getElementById('overlay').style.display = 'none';
       modalOpen = false;
       stopConfetti();
-      // Now just start normally from the queue — all players are already in it
       if (state.queue.length >= 2) startMatch();
       else { renderMatch(); renderQueue(); }
     }
@@ -1063,7 +1174,7 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
     }
 
     /* ═══════════════════════════════════════════════════════════
-       INIT
+       INIT SYSTEM CALL
     ═══════════════════════════════════════════════════════════ */
     init();
 
@@ -1075,7 +1186,13 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
       if (e.key === '1' && state.match && !modalOpen) handlePoint(0);
       else if (e.key === '2' && state.match && !modalOpen) handlePoint(1);
-      else if (e.key === 'Enter' && modalOpen) closeWinner();
+      else if (e.key === 'Enter' && modalOpen) {
+        if(document.getElementById('qr-modal').style.display === 'block') {
+          closeQRModal();
+        } else {
+          closeWinner();
+        }
+      }
     });
 
     /* ═══════════════════════════════════════════════════════════
@@ -1143,16 +1260,18 @@ input[type=text] { flex: 1; min-width: 0; background: var(--surface2); border: 1
 
     function showTrivia() {
       const el = document.getElementById('trivia-text');
-      el.classList.remove('visible');
-      setTimeout(() => {
-        el.textContent = TRIVIA[triviaIdx];
-        triviaIdx = (triviaIdx + 1) % TRIVIA.length;
-        el.classList.add('visible');
-      }, 600);
+      if (el) {
+        el.classList.remove('visible');
+        setTimeout(() => {
+          el.textContent = TRIVIA[triviaIdx];
+          triviaIdx = (triviaIdx + 1) % TRIVIA.length;
+          el.classList.add('visible');
+        }, 600);
+      }
     }
 
     showTrivia();
-    setInterval(showTrivia, 18000); // rotate every 18s
+    setInterval(showTrivia, 18000);
   </script>
 </body>
 </html>
