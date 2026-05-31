@@ -54,15 +54,16 @@
       font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; font-size: 15px; line-height: 1.2; }
 
     /* ── HEADER ─────────────────────────────────────────────── */
-    header { background: var(--surface); border-bottom: 2px solid var(--border); padding: 0.5rem 1.5rem; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px var(--shadow); }
-    .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 3px; color: var(--primary); white-space: nowrap; }
+    header { background: var(--surface); border-bottom: 2px solid var(--border); padding: 0.5rem 1rem; display: flex; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px var(--shadow); }
+    .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 3px; color: var(--primary); white-space: nowrap; flex-shrink: 0; }
     #ts-lider { animation: pulse 2s infinite; } @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
     .header-center {
       flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      min-width: 0;
     }
     .theme-toggle-btn {
       background: var(--surface2);
@@ -77,13 +78,17 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .theme-toggle-btn:active { opacity: 0.7; }
+    .btn-label { display: inline; }
     .header-right {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       gap: 1px;
+      flex-shrink: 0;
     }
     #clock {
       font-family: 'Bebas Neue', sans-serif;
@@ -93,6 +98,16 @@
       line-height: 1;
     }
     #date-badge { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+    @media (max-width: 600px) {
+      header { padding: 0.4rem 0.75rem; gap: 6px; }
+      .logo-text { font-size: 22px; letter-spacing: 1.5px; }
+      .theme-toggle-btn { padding: 6px 10px; border-radius: 50%; width: 36px; height: 36px; justify-content: center; }
+      .btn-label { display: none; }
+      .theme-toggle-btn span:first-child { font-size: 16px; }
+      #clock { font-size: 20px; letter-spacing: 1px; }
+      #date-badge { display: none; }
+    }
 
     /* ── LAYOUT ─────────────────────────────────────────────── */
     .container { max-width: 1200px; margin: 0 auto; padding: 0.5rem 1.5rem; }
@@ -433,6 +448,92 @@
     /* ── SESSION TIMER ──────────────────────────────────────── */
     #session-timer { font-size: 11px; color: var(--muted); }
     #session-timer span { color: var(--primary); font-weight: 700; }
+
+    /* ── SWAP FLASH ─────────────────────────────────────────── */
+    @keyframes swapFlash {
+      0%   { background: var(--primary-dim); }
+      40%  { background: var(--primary); }
+      100% { background: transparent; }
+    }
+    .swap-flash { animation: swapFlash 0.4s ease-out; }
+
+    /* ── MATCH POINT BANNER ─────────────────────────────────── */
+    #match-point-banner {
+      display: none;
+      background: linear-gradient(135deg, var(--primary), #e65100);
+      color: #000;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      text-align: center;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 10px;
+      animation: matchPointPulse 0.7s ease infinite alternate;
+    }
+    #match-point-banner.show { display: block; }
+    @keyframes matchPointPulse {
+      from { opacity: 1; transform: scale(1); }
+      to   { opacity: 0.85; transform: scale(1.02); }
+    }
+
+    /* ── SERVE INDICATOR ────────────────────────────────────── */
+    #serve-indicator {
+      display: none;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      padding: 6px 0 0;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+    }
+    #serve-indicator.show { display: flex; }
+    #serve-indicator .serve-name { color: var(--primary); font-weight: 700; }
+    .serve-dot {
+      width: 8px; height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: serveBlink 0.9s ease infinite alternate;
+    }
+    @keyframes serveBlink { from { opacity: 1; } to { opacity: 0.2; } }
+
+    /* ── MATCH DURATION ─────────────────────────────────────── */
+    #match-timer {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      padding-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+    #match-timer span { color: var(--primary); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    /* ── PAUSE MODAL ────────────────────────────────────────── */
+    #pause-modal {
+      display: none; position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 2rem;
+      text-align: center;
+      z-index: 201;
+      width: min(380px, 90vw);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    #pause-modal .pause-score {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      color: var(--primary);
+      letter-spacing: 3px;
+      margin: 0.5rem 0;
+    }
+    #pause-modal .pause-players {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
   </style>
 </head>
 <body>
@@ -444,10 +545,10 @@
     <div class="header-center">
       <button class="theme-toggle-btn" onclick="toggleTheme()" id="theme-btn">
         <span id="theme-icon">☀️</span>
-        <span id="theme-label">Modo Claro</span>
+        <span id="theme-label" class="btn-label">Modo Claro</span>
       </button>
       <button class="theme-toggle-btn" onclick="openQRModal()" style="border-color: var(--primary); color: var(--primary)">
-        <span>📱</span><span>Compartilhar</span>
+        <span>📱</span><span class="btn-label">Compartilhar</span>
       </button>
     </div>
     <div class="header-right">
@@ -512,6 +613,8 @@
           </div>
           <div id="match-active" style="display:none">
             <div class="card">
+              <div id="match-timer">⏱ <span id="match-time-val">00:00</span></div>
+              <div id="match-point-banner">⚡ MATCH POINT ⚡</div>
               <div class="prog-wrap" id="prog-wrap"></div>
               <div class="scoreboard">
                 <div class="score-area" onclick="handlePoint(0)">
@@ -532,10 +635,16 @@
                   </div>
                 </div>
               </div>
+              <div id="serve-indicator">
+                <div class="serve-dot"></div>
+                <span>Saque: <span class="serve-name" id="serve-name">—</span></span>
+              </div>
               <div id="rotation-hint" class="rotation-info"></div>
-              <div style="display:flex; gap:10px; margin-top:1.25rem;">
-                <button class="btn full lg" style="flex:1" onclick="undo()">↩ Desfazer</button>
-                <button class="btn danger full lg" style="flex:1" onclick="cancelMatch()">✕ Cancelar</button>
+              <div style="display:flex; gap:10px; margin-top:1.25rem; flex-wrap:wrap;">
+                <button class="btn full lg" style="flex:1; min-width:80px" onclick="undo()">↩ Desfazer</button>
+                <button class="btn full lg" style="flex:1; min-width:80px" onclick="swapSides()">⇄ Trocar Lados</button>
+                <button class="btn full lg" style="flex:1; min-width:80px" onclick="pauseMatch()">⏸ Pausar</button>
+                <button class="btn danger full lg" style="flex:1; min-width:80px" onclick="cancelMatch()">✕ Cancelar</button>
               </div>
             </div>
           </div>
@@ -615,6 +724,18 @@
   </div>
 
   <div class="overlay" id="overlay"></div>
+
+  <div id="pause-modal">
+    <div style="font-size: 36px; margin-bottom: 6px">⏸</div>
+    <div style="font-family: 'Bebas Neue'; font-size: 26px; color: var(--primary); letter-spacing: 2px;">Partida Pausada</div>
+    <div class="pause-players" id="pause-players">—</div>
+    <div class="pause-score" id="pause-score">0 x 0</div>
+    <div style="font-size: 12px; color: var(--muted); margin-bottom: 1.5rem" id="pause-serve-info">—</div>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <button class="btn primary full lg" onclick="resumeMatch()">▶ Retomar Partida</button>
+      <button class="btn danger full" onclick="cancelMatchFromPause()">✕ Cancelar e devolver à fila</button>
+    </div>
+  </div>
   <div class="winner-modal" id="winner-modal">
     <div class="winner-trophy">🏆</div>
     <div class="winner-name-display" id="win-name"></div>
@@ -641,9 +762,10 @@
     const STORAGE_KEY = 'elt_tt_v1';
     let state = {
       allPlayers: [], queue: [], match: null,
-      ranking: {}, history: [], lastState: null,
+      ranking: {}, history: [], lastStates: [],
       winScore: 5, sessionStart: Date.now(), themeMode: 'dark'
     };
+    let matchTimerInterval = null;
 
     /* ═══════════════════════════════════════════════════════════
        AUDIO SYNTHESIS SYSTEM (NATIVE BOUNCES)
@@ -820,6 +942,13 @@
         state = JSON.parse(saved);
         if (!state.allPlayers) state.allPlayers = [...state.queue];
         if (!state.sessionStart) state.sessionStart = Date.now();
+        if (!state.lastStates) state.lastStates = [];
+        // Se havia partida pausada, limpar flag de pausa ao recarregar
+        if (state.match && state.match.pausedAt) {
+          const pausedDuration = Date.now() - state.match.pausedAt;
+          state.match.startTime += pausedDuration;
+          delete state.match.pausedAt;
+        }
       }
       applyTheme(state.themeMode || 'dark');
       startThemeAutoCycle();
@@ -827,6 +956,8 @@
       updateClock();
       setInterval(updateClock, 1000);
       refreshAll();
+      // Retomar timer se havia partida ativa salva
+      if (state.match) startMatchTimer();
       if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
     }
 
@@ -978,19 +1109,67 @@
     /* ═══════════════════════════════════════════════════════════
        MATCH (LOGIC WITH 2-POINT ADVANTAGE RULE / DEUCE)
     ═══════════════════════════════════════════════════════════ */
+    /* ═══════════════════════════════════════════════════════════
+       MATCH TIMER
+    ═══════════════════════════════════════════════════════════ */
+    function startMatchTimer() {
+      clearInterval(matchTimerInterval);
+      matchTimerInterval = setInterval(() => {
+        if (!state.match || !state.match.startTime) return;
+        const elapsed = Math.floor((Date.now() - state.match.startTime) / 1000);
+        const m = Math.floor(elapsed / 60).toString().padStart(2, '0');
+        const s = (elapsed % 60).toString().padStart(2, '0');
+        const el = document.getElementById('match-time-val');
+        if (el) el.textContent = `${m}:${s}`;
+      }, 1000);
+    }
+
+    function stopMatchTimer() {
+      clearInterval(matchTimerInterval);
+      matchTimerInterval = null;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SERVE CALCULATOR (troca a cada 2 pontos, deuce = 1 a 1)
+    ═══════════════════════════════════════════════════════════ */
+    function getServer(match) {
+      const total = match.s1 + match.s2;
+      const target = WINNING_SCORE;
+      // No deuce, saque troca a cada ponto
+      if (match.s1 >= target - 1 && match.s2 >= target - 1) {
+        return total % 2 === 0 ? match.p1 : match.p2;
+      }
+      return Math.floor(total / 2) % 2 === 0 ? match.p1 : match.p2;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       MATCH POINT DETECTOR
+    ═══════════════════════════════════════════════════════════ */
+    function isMatchPoint(match) {
+      const { s1, s2 } = match;
+      const t = WINNING_SCORE;
+      const inDeuce = s1 >= t - 1 && s2 >= t - 1;
+      if (inDeuce) return (Math.abs(s1 - s2) === 1);
+      return (s1 === t - 1 && s1 > s2) || (s2 === t - 1 && s2 > s1);
+    }
+
     function startMatch() {
       if (state.queue.length < 2) return;
-      state.match = { p1: state.queue[0], p2: state.queue[1], s1: 0, s2: 0 };
+      state.match = { p1: state.queue[0], p2: state.queue[1], s1: 0, s2: 0, startTime: Date.now() };
       state.queue.splice(0, 2);
-      state.lastState = null;
+      state.lastStates = [];
       save(); renderMatch(); renderQueue();
+      startMatchTimer();
       showTab('placar', document.getElementById('tab-btn-placar'));
     }
 
     function renderMatch() {
       const noMatch = document.getElementById('no-match');
       const active = document.getElementById('match-active');
-      if (!state.match) { noMatch.style.display = 'block'; active.style.display = 'none'; return; }
+      if (!state.match) {
+        noMatch.style.display = 'block'; active.style.display = 'none';
+        stopMatchTimer(); return;
+      }
       noMatch.style.display = 'none'; active.style.display = 'block';
 
       document.getElementById('p1name').textContent = state.match.p1;
@@ -1010,11 +1189,34 @@
       hint.innerHTML = state.queue.length > 0
         ? `🔄 Próximo na fila: <span>${state.queue[0]}</span>`
         : '';
+
+      // Saque
+      const server = getServer(state.match);
+      const serveEl = document.getElementById('serve-indicator');
+      const serveNameEl = document.getElementById('serve-name');
+      serveEl.classList.add('show');
+      serveNameEl.textContent = server;
+
+      // Match point banner
+      const banner = document.getElementById('match-point-banner');
+      if (isMatchPoint(state.match)) banner.classList.add('show');
+      else banner.classList.remove('show');
+
+      // Undo counter hint
+      const undoBtn = document.querySelector('button[onclick="undo()"]');
+      if (undoBtn) {
+        const n = state.lastStates.length;
+        undoBtn.textContent = n > 0 ? `↩ Desfazer (${n})` : '↩ Desfazer';
+      }
     }
 
     function handlePoint(playerIndex) {
       if (!state.match) return;
-      state.lastState = JSON.parse(JSON.stringify(state.match));
+      // Vibração de feedback tátil
+      if (navigator.vibrate) navigator.vibrate(30);
+      // Pilha de undo (máx 10)
+      state.lastStates.push(JSON.parse(JSON.stringify(state.match)));
+      if (state.lastStates.length > 10) state.lastStates.shift();
       
       if (playerIndex === 0) { state.match.s1++; animate('p1score'); }
       else { state.match.s2++; animate('p2score'); }
@@ -1027,16 +1229,16 @@
 
       if ((s1 >= target || s2 >= target) && Math.abs(s1 - s2) >= 2) {
         finishMatch();
-      } else { 
-        save(); 
-        renderMatch(); 
+      } else {
+        save();
+        renderMatch();
       }
     }
 
     function undo() {
-      if (state.lastState) {
-        state.match = JSON.parse(JSON.stringify(state.lastState));
-        state.lastState = null; save(); renderMatch();
+      if (state.lastStates && state.lastStates.length > 0) {
+        state.match = state.lastStates.pop();
+        save(); renderMatch();
       }
     }
 
@@ -1048,17 +1250,24 @@
     }
 
     function finishMatch() {
+      stopMatchTimer();
       const m = state.match;
       const winner = m.s1 > m.s2 ? m.p1 : m.p2;
       const loser  = m.s1 > m.s2 ? m.p2 : m.p1;
+      const duration = m.startTime ? Math.floor((Date.now() - m.startTime) / 1000) : 0;
+      const durMin = Math.floor(duration / 60);
+      const durSec = duration % 60;
+      const durStr = durMin > 0 ? `${durMin}min ${durSec}s` : `${durSec}s`;
 
+      if (navigator.vibrate) navigator.vibrate([50, 80, 50, 80, 200]);
       playSound('victory');
 
       state.history.unshift({
         win: winner,
         score: `${m.s1} x ${m.s2}`,
         players: `${m.p1} vs ${m.p2}`,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        duration: durStr
       });
 
       if (!state.ranking[winner]) state.ranking[winner] = { w: 0, d: 0 };
@@ -1069,12 +1278,13 @@
       state.queue.push(loser);
       state.queue.unshift(winner);
       state.match = null;
+      state.lastStates = [];
       save();
 
       const nextP1 = state.queue[0] || '—';
       const nextP2 = state.queue[1] || '—';
       document.getElementById('win-name').textContent = winner;
-      document.getElementById('win-score').textContent = `Placar final: ${m.s1} a ${m.s2}`;
+      document.getElementById('win-score').textContent = `Placar final: ${m.s1} a ${m.s2} · Duração: ${durStr}`;
       document.getElementById('win-next').textContent =
         state.queue.length >= 2
           ? `Próxima partida: ${nextP1} vs ${nextP2}`
@@ -1094,11 +1304,81 @@
       else { renderMatch(); renderQueue(); }
     }
 
+    /* ═══════════════════════════════════════════════════════════
+       PAUSE / RESUME
+    ═══════════════════════════════════════════════════════════ */
+    function pauseMatch() {
+      if (!state.match) return;
+      stopMatchTimer();
+      // Guardar tempo pausado para compensar ao retomar
+      state.match.pausedAt = Date.now();
+      save();
+      const m = state.match;
+      document.getElementById('pause-players').textContent = `${m.p1} vs ${m.p2}`;
+      document.getElementById('pause-score').textContent = `${m.s1} x ${m.s2}`;
+      const server = getServer(m);
+      document.getElementById('pause-serve-info').textContent = `🏓 Saque ao retomar: ${server}`;
+      document.getElementById('pause-modal').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+      modalOpen = true;
+    }
+
+    function resumeMatch() {
+      if (state.match && state.match.pausedAt) {
+        // Deslocar o startTime pelo tempo pausado
+        const pausedDuration = Date.now() - state.match.pausedAt;
+        state.match.startTime += pausedDuration;
+        delete state.match.pausedAt;
+        save();
+      }
+      document.getElementById('pause-modal').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+      modalOpen = false;
+      startMatchTimer();
+      renderMatch();
+    }
+
+    function cancelMatchFromPause() {
+      document.getElementById('pause-modal').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+      modalOpen = false;
+      state.queue.unshift(state.match.p2);
+      state.queue.unshift(state.match.p1);
+      state.match = null;
+      state.lastStates = [];
+      stopMatchTimer();
+      save(); renderMatch(); renderQueue();
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SWAP SIDES
+    ═══════════════════════════════════════════════════════════ */
+    function swapSides() {
+      if (!state.match) return;
+      // Trocar jogadores e pontuações
+      [state.match.p1, state.match.p2] = [state.match.p2, state.match.p1];
+      [state.match.s1, state.match.s2] = [state.match.s2, state.match.s1];
+      // Vibração dupla para sinalizar a troca
+      if (navigator.vibrate) navigator.vibrate([40, 60, 40]);
+      save();
+      renderMatch();
+      // Flash visual no scoreboard inteiro
+      const scoreboard = document.querySelector('.scoreboard');
+      if (scoreboard) {
+        scoreboard.classList.remove('swap-flash');
+        void scoreboard.offsetWidth;
+        scoreboard.classList.add('swap-flash');
+        scoreboard.addEventListener('animationend', () => scoreboard.classList.remove('swap-flash'), { once: true });
+      }
+    }
+
     function cancelMatch() {
       if (confirm('Cancelar partida? Os jogadores voltam à fila.')) {
         state.queue.unshift(state.match.p2);
         state.queue.unshift(state.match.p1);
         state.match = null;
+        state.lastStates = [];
+        stopMatchTimer();
         save(); renderMatch(); renderQueue();
       }
     }
@@ -1123,10 +1403,11 @@
       if (confirm('Resetar tudo?')) {
         state = {
           allPlayers: [], queue: [], match: null,
-          ranking: {}, history: [], lastState: null,
+          ranking: {}, history: [], lastStates: [],
           winScore: 5, sessionStart: Date.now(),
           themeMode: state.themeMode
         };
+        stopMatchTimer();
         localStorage.removeItem(STORAGE_KEY);
         syncScoreUI();
         refreshAll();
@@ -1162,13 +1443,13 @@
     ═══════════════════════════════════════════════════════════ */
     function renderHistory() {
       document.getElementById('hist-list').innerHTML = state.history.map((h, i) => `
-        <div style="padding:16px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center">
-          <div>
-            <div style="font-size:11px; color:var(--muted); margin-bottom:3px">#${state.history.length - i} · ${h.time}</div>
+        <div style="padding:16px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:12px">
+          <div style="min-width:0">
+            <div style="font-size:11px; color:var(--muted); margin-bottom:3px">#${state.history.length - i} · ${h.time}${h.duration ? ' · ⏱ ' + h.duration : ''}</div>
             <div style="font-size:15px; font-weight:600">${h.players}</div>
             <div style="font-size:12px; color:var(--primary); margin-top:3px">🏆 ${h.win}</div>
           </div>
-          <div style="font-family:'Bebas Neue'; font-size:30px; color:var(--text)">${h.score}</div>
+          <div style="font-family:'Bebas Neue'; font-size:30px; color:var(--text); flex-shrink:0">${h.score}</div>
         </div>
       `).join('') || '<div style="text-align:center; padding:24px; color:var(--muted)">Nenhuma partida ainda</div>';
     }
