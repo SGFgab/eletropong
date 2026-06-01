@@ -1,37 +1,51 @@
-const CACHE_NAME = 'eletropong-v3'; // Já coloquei v3 aqui para forçar a atualização!
-const ASSETS = [
+// Mude este número (ex: v3, v4) SEMPRE que fizer uma alteração no seu index.html
+const CACHE_NAME = 'elt-tt-cache-v2'; 
+
+const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './manifest.json',
-  'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap'
+  './manifest.json'
 ];
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(
+// Instalação: Salva os arquivos iniciais no cache
+self.addEventListener('install', (event) => {
+  event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
+      return cache.addAll(ASSETS_TO_CACHE);
     })
   );
+  // Força o novo Service Worker a assumir o controle imediatamente
+  self.skipWaiting(); 
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) => {
+// Ativação: Limpa os caches antigos se o CACHE_NAME mudar
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Limpando cache antigo:', cacheName);
+            return caches.delete(cacheName);
           }
         })
       );
     })
   );
+  self.clients.claim(); // Atualiza todas as abas abertas do app
 });
 
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      return cachedResponse || fetch(e.request);
-    })
+// Interceptação (Network First): Tenta a internet primeiro, se falhar usa o cache
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    fetch(event.request)
+      .then((networkResponse) => {
+        // Se a internet funcionar, retorna a versão mais recente do GitHub
+        return networkResponse;
+      })
+      .catch(() => {
+        // Se estiver offline, retorna a versão salva no cache
+        return caches.match(event.request);
+      })
   );
 });

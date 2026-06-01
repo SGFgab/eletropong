@@ -1,55 +1,44 @@
-# 🏓 ELT TT Tournament (Eletropong)
+# 🏓 ELT TT Tournament
 
-O **ELT TT Tournament** é um sistema web completo, responsivo e estático para gerenciamento e pontuação de torneios informais de Tênis de Mesa (Ping-Pong). Desenvolvido para rodar direto no navegador, o app gerencia filas de espera, calcula pontuações em tempo real, mantém um histórico de partidas e gera um ranking automatizado com taxa de aproveitamento dos jogadores.
+Um aplicativo web progressivo (PWA) completo desenvolvido para gerenciar filas, placares e rankings de torneios de Tênis de Mesa (Ping Pong). Ideal para automatizar as partidas do dia a dia, cronometrar os jogos e manter o histórico de competições de forma simples e intuitiva.
 
-🌐 **Acesse o projeto online:** [https://sgfgab.github.io/eletropong/](https://sgfgab.github.io/eletropong/)
+## ✨ Funcionalidades
 
----
+- **Gerenciamento de Fila de Espera:** Adicione jogadores à fila facilmente. O sistema rotaciona os jogadores automaticamente ao fim de cada partida.
+- **Placar Interativo em Tempo Real:** Sistema de pontuação clicável ou via teclado, com detecção automática de *Deuce* (vantagem de 2 pontos) e alerta visual de *Match Point*.
+- **Sistema de Saque Inteligente:** O aplicativo calcula e indica visualmente de quem é a vez de sacar (troca a cada 2 pontos).
+- **Controles Avançados de Partida:** Opções para Desfazer ponto (Undo), Trocar Lados, Pausar a partida (congelando o cronômetro) e Cancelar.
+- **Ranking Automático e Estatísticas:** Histórico de partidas, cálculo de vitórias/derrotas, taxa de aproveitamento (%) e estatísticas da sessão (maior sequência de vitórias, médias, etc.).
+- **Exportação de Dados:** Exporte o ranking atualizado do dia para um arquivo `.txt` com um clique.
+- **Modo Tablet Customizado:** Layout otimizado projetado especificamente para telas maiores, perfeito para deixar como placar visível para a torcida.
+- **PWA e Suporte Offline:** Instalável no celular via navegador, com suporte a funcionamento offline graças à implementação de Service Workers (`sw.js`).
+- **Acessibilidade e Design:** Modo Claro e Escuro, animações de confete e um gerador de QR Code interno para que outros jogadores possam escanear e acessar o app rapidamente.
 
-## ✨ Funcionalidades Principais
+## 🛠️ Estrutura e Tecnologias
 
-* 👥 **Fila de Espera Dinâmica:** Adicione jogadores à fila. O sistema gerencia quem está jogando e quem é o próximo de forma visual (com adaptações exclusivas para Mobile e Desktop).
-* 📊 **Placar em Tempo Real:** Pontuação interativa clicando na tela ou utilizando **atalhos do teclado**. Inclui indicador visual de quem está liderando a partida e barra de progresso adaptável.
-* 🔄 **Sistema de Rotação Automática:** Ao finalizar a partida, o vencedor vai para a frente da fila (mantém a mesa) e o perdedor vai para o fim da fila para aguardar uma nova chance.
-* ⚖️ **Regra de Vantagem Real (Deuce):** O jogo não termina estritamente na pontuação máxima se houver empate técnico. O sistema exige a diferença real de 2 pontos para consagrar o campeão (ex: 5x4 vai a 6, 10x10 vai a 12), seguindo as regras oficiais do esporte.
-* 🔊 **Efeitos Sonoros Nativos:** Utiliza a *Audio Synthesis API* do navegador para gerar bipes realistas na marcação de pontos e uma fanfarra festiva ao decretar o vencedor, sem a necessidade de carregar arquivos pesados de áudio.
-* 📥 **Exportação de Ranking:** Botão inteligente na aba de classificação que gera e faz o download instantâneo de um arquivo `.txt` formatado com as posições, vitórias, derrotas e taxa de aproveitamento de todos, pronto para mandar no grupo de WhatsApp.
-* 📱 **Compartilhamento via QR Code:** Sistema integrado no cabeçalho que gera em tempo real o QR Code da URL atual do app, permitindo que novos jogadores entrem na fila apontando a câmera do celular.
-* 🏆 **Ranking Automatizado:** Tabela de classificação baseada na taxa de vitória (%) e quantidade de vitórias, incluindo medalhas para o pódio (🥇, 🥈, 🥉).
-* 📜 **Histórico de Partidas:** Registro completo de todos os jogos da sessão com horário, jogadores envolvidos e placar final.
-* 💡 **Métricas Estatísticas Avançadas:** O painel exibe dados como o atual Líder, média de pontos por partida, maior sequência de vitórias (*win streak*) e a partida mais disputada do dia.
-* 🌓 **Troca de Temas Inteligente:** Suporte a Modo Escuro (Dark) e Modo Claro (Light) com transições suaves e um sistema que alterna o tema automaticamente a cada 2 minutos para evitar o efeito Burn-in em telas fixas.
-* 🚀 **PWA (Progressive Web App):** Configurado com Manifesto e suporte a Service Worker, permitindo que o site seja instalado na tela inicial do celular e funcione 100% offline à beira da mesa.
-* 💬 **Curiosidades:** Um sistema rotativo no rodapé que exibe fatos históricos e regras sobre o tênis de mesa.
+O projeto foi construído utilizando tecnologias web nativas, garantindo leveza e alta velocidade sem dependência de bibliotecas externas complexas:
+- **HTML5** e **CSS3** (Variáveis CSS, CSS Grid/Flexbox, animações nativas).
+- **JavaScript (Vanilla)** para toda a lógica de estado, fila e armazenamento (`localStorage`).
+- **Web Audio API** para os efeitos sonoros de rebatida e vitória.
+- **PWA (`manifest.json` e `sw.js`)** para instalação e cache "Network First".
 
----
+## 🚀 Como Usar
 
-## ⌨️ Atalhos do Teclado (Produtividade na Mesa)
+### Instalação (Hospedagem)
+Basta hospedar os arquivos em qualquer servidor estático (como o **GitHub Pages**). Certifique-se de que os três arquivos principais estejam no mesmo diretório:
+- `index.html`
+- `sw.js`
+- `manifest.json`
 
-Para facilitar o controle enquanto a raquete está na mão, você pode controlar o painel usando apenas o teclado:
-* `Teclado 1`: Computa ponto para o **Jogador 1** (Esquerda).
-* `Teclado 2`: Computa ponto para o **Jogador 2** (Direita).
-* `Teclado Enter`: Avança os modais (Vitória ou QR Code) e inicia automaticamente a próxima partida da fila.
+### Atalhos de Teclado
+Para facilitar a marcação rápida durante o jogo, você pode usar o teclado:
+- Tecla `1`: Ponto para o Jogador 1
+- Tecla `2`: Ponto para o Jogador 2
+- Tecla `Enter`: Fechar pop-ups e iniciar a próxima partida
 
----
+## 💾 Cache e Atualizações
 
-## 🛠️ Tecnologias Utilizadas
-
-O projeto foi construído utilizando a stack web nativa, sem a necessidade de frameworks pesados, garantindo performance máxima:
-
-* **HTML5:** Estruturação semântica e layouts otimizados.
-* **CSS3 (Custom Properties & Grid/Flexbox):** Design moderno, responsivo e transições suaves de tema.
-* **JavaScript (ES6+):** Lógica de estado da aplicação, gerenciamento de filas e manipulação do DOM.
-* **Web Audio API & Canvas API:** Geração sintética de sons nativos e chuva de confetes customizada ao finalizar partidas.
-* **LocalStorage:** Armazenamento interno no navegador para garantir que os dados não sejam perdidos ao recarregar a página.
-* **Google Fonts:** Tipografia estilizada usando as fontes *Bebas Neue* e *DM Sans*.
+O aplicativo utiliza um Service Worker com estratégia *Network First*. Isso significa que ele sempre tentará buscar a versão mais recente caso haja internet. Para forçar uma atualização manual de versão após subir novos códigos, altere a constante `CACHE_NAME` dentro do arquivo `sw.js`.
 
 ---
-
-## 🚀 Como Executar o Projeto Localmente
-
-Como o projeto é feito em JavaScript puro e estático, você não precisa instalar nenhuma dependência (como Node.js). 
-
-1. Baixe ou clone este repositório:
-   ```bash
-   git clone [https://github.com/sgfgab/eletropong.git](https://github.com/sgfgab/eletropong.git)
+Desenvolvido por Gabriel. Bora pro jogo! 🏓

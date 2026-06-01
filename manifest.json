@@ -1,7 +1,7 @@
 {
   "name": "ELT TT Tournament",
-  "short_name": "Eletropong",
-  "description": "Gerenciador e marcador de torneios de Tênis de Mesa.",
+  "short_name": "ELT PingPong",
+  "description": "Aplicativo para gerenciamento de fila e placar de Tênis de Mesa",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0e0e0e",
@@ -9,7 +9,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3565/3565814.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/1033/1033166.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1033/1033166.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
