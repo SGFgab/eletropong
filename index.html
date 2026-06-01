@@ -350,7 +350,7 @@
     .overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.8);
-      z-index: 200; backdrop-filter: blur(6px);
+      z-index: 400; backdrop-filter: blur(6px);
     }
     .winner-modal, .qr-modal {
       display: none; position: fixed;
@@ -361,7 +361,7 @@
       border-radius: var(--radius);
       padding: 3rem 2.5rem;
       text-align: center;
-      z-index: 201;
+      z-index: 401;
       width: min(420px, 90vw);
       box-shadow: 0 20px 60px rgba(0,0,0,0.5);
     }
@@ -389,7 +389,7 @@
     .qr-frame img { display: block; max-width: 100%; height: auto; }
 
     /* ── CONFETTI ───────────────────────────────────────────── */
-    #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 202; display: none; }
+    #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 402; display: none; }
 
     /* ── FOOTER ─────────────────────────────────────────────── */
     footer { margin-top: 0.5rem; padding: 0.5rem 1.5rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
@@ -518,7 +518,7 @@
       border-radius: var(--radius);
       padding: 2rem 2rem;
       text-align: center;
-      z-index: 201;
+      z-index: 401;
       width: min(380px, 90vw);
       box-shadow: 0 20px 60px rgba(0,0,0,0.5);
     }
@@ -549,6 +549,9 @@
       </button>
       <button class="theme-toggle-btn" onclick="openQRModal()" style="border-color: var(--primary); color: var(--primary)">
         <span>📱</span><span class="btn-label">Compartilhar</span>
+      </button>
+      <button class="theme-toggle-btn" id="tablet-btn" onclick="toggleTablet()" style="border-color:var(--border)">
+        <span>⬜</span><span class="btn-label">Modo Tablet</span>
       </button>
     </div>
     <div class="header-right">
@@ -609,7 +612,7 @@
         <div id="tab-placar" class="section active">
           <div id="no-match" class="card" style="text-align:center; padding: 5rem 1rem; color: var(--muted);">
             <div style="font-size: 48px; margin-bottom: 12px">🏓</div>
-            <div style="font-family:'Bebas Neue'; font-size:20px; letter-spacing:1px;">Aguardando jogadores na fila...</div>
+            <div style="font-family:'Bebas Neue', sans-serif; font-size:20px; letter-spacing:1px;">Aguardando jogadores na fila...</div>
           </div>
           <div id="match-active" style="display:none">
             <div class="card">
@@ -727,7 +730,7 @@
 
   <div id="pause-modal">
     <div style="font-size: 36px; margin-bottom: 6px">⏸</div>
-    <div style="font-family: 'Bebas Neue'; font-size: 26px; color: var(--primary); letter-spacing: 2px;">Partida Pausada</div>
+    <div style="font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--primary); letter-spacing: 2px;">Partida Pausada</div>
     <div class="pause-players" id="pause-players">—</div>
     <div class="pause-score" id="pause-score">0 x 0</div>
     <div style="font-size: 12px; color: var(--muted); margin-bottom: 1.5rem" id="pause-serve-info">—</div>
@@ -748,7 +751,7 @@
   </div>
 
   <div class="winner-modal" id="qr-modal" style="padding: 2rem 2rem;">
-    <div style="font-family: 'Bebas Neue'; font-size: 28px; color: var(--primary); letter-spacing: 1.5px;">Escanear Torneio</div>
+    <div style="font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--primary); letter-spacing: 1.5px;">Escanear Torneio</div>
     <div style="font-size: 13px; color: var(--muted); margin-top: 4px;">Abra a câmera do celular para entrar na fila!</div>
     <div class="qr-frame" id="qr-frame-target"></div>
     <button class="btn full" onclick="closeQRModal()">Fechar</button>
@@ -760,6 +763,9 @@
     ═══════════════════════════════════════════════════════════ */
     let WINNING_SCORE = 5;
     const STORAGE_KEY = 'elt_tt_v1';
+    let _tabletActive = false;
+    let _tabletClockId = null;
+    let modalOpen = false;
     let state = {
       allPlayers: [], queue: [], match: null,
       ranking: {}, history: [], lastStates: [],
@@ -1104,6 +1110,7 @@
       document.getElementById('start-side').style.display = canStart ? 'block' : 'none';
 
       document.getElementById('ts-na-fila').textContent = state.queue.length;
+      if (typeof _tabletActive !== 'undefined' && _tabletActive) _tabletRender();
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -1208,6 +1215,7 @@
         const n = state.lastStates.length;
         undoBtn.textContent = n > 0 ? `↩ Desfazer (${n})` : '↩ Desfazer';
       }
+      if (typeof _tabletActive !== 'undefined' && _tabletActive) _tabletRender();
     }
 
     function handlePoint(playerIndex) {
@@ -1373,14 +1381,13 @@
     }
 
     function cancelMatch() {
-      if (confirm('Cancelar partida? Os jogadores voltam à fila.')) {
-        state.queue.unshift(state.match.p2);
-        state.queue.unshift(state.match.p1);
-        state.match = null;
-        state.lastStates = [];
-        stopMatchTimer();
-        save(); renderMatch(); renderQueue();
-      }
+      if (!state.match) return;
+      state.queue.unshift(state.match.p2);
+      state.queue.unshift(state.match.p1);
+      state.match = null;
+      state.lastStates = [];
+      stopMatchTimer();
+      save(); renderMatch(); renderQueue();
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -1449,7 +1456,7 @@
             <div style="font-size:15px; font-weight:600">${h.players}</div>
             <div style="font-size:12px; color:var(--primary); margin-top:3px">🏆 ${h.win}</div>
           </div>
-          <div style="font-family:'Bebas Neue'; font-size:30px; color:var(--text); flex-shrink:0">${h.score}</div>
+          <div style="font-family:'Bebas Neue', sans-serif; font-size:30px; color:var(--text); flex-shrink:0">${h.score}</div>
         </div>
       `).join('') || '<div style="text-align:center; padding:24px; color:var(--muted)">Nenhuma partida ainda</div>';
     }
@@ -1462,7 +1469,6 @@
     /* ═══════════════════════════════════════════════════════════
        KEYBOARD SHORTCUTS
     ═══════════════════════════════════════════════════════════ */
-    let modalOpen = false;
     document.addEventListener('keydown', function(e) {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
       if (e.key === '1' && state.match && !modalOpen) handlePoint(0);
@@ -1553,6 +1559,382 @@
 
     showTrivia();
     setInterval(showTrivia, 18000);
+
+
+    /* ═══════════════════════════════════════════════════════════
+       TABLET MODE
+    ═══════════════════════════════════════════════════════════ */
+    function toggleTablet() {
+      _tabletActive = !_tabletActive;
+      const el = document.getElementById('tablet-overlay');
+      el.style.display = _tabletActive ? 'flex' : 'none';
+      if (_tabletActive) {
+        _tabletClockId = setInterval(_tabletTick, 1000);
+        _tabletTick();
+        _tabletRender();
+      } else {
+        clearInterval(_tabletClockId);
+        _tabletClockId = null;
+      }
+      try { localStorage.setItem('elt_tablet', _tabletActive ? '1' : '0'); } catch(e) {}
+    }
+
+    function _tabletTick() {
+      // clock
+      const cl = document.getElementById('tab-clock');
+      if (cl) cl.textContent = new Date().toLocaleTimeString('pt-BR');
+      // match timer sync
+      const src = document.getElementById('match-time-val');
+      const dst = document.getElementById('tab-timer');
+      if (src && dst) dst.textContent = src.textContent;
+    }
+
+    function _tabletRender() {
+      if (!_tabletActive) return;
+
+      // stats
+      const players = Object.keys(state.ranking);
+      const el = (id) => document.getElementById(id);
+      el('tab-st-partidas').textContent = state.history.length;
+      el('tab-st-jogadores').textContent = players.length;
+      el('tab-st-fila').textContent = state.queue.length;
+      if (players.length > 0) {
+        const best = [...players].sort((a,b) => {
+          const ra = state.ranking[a].w/((state.ranking[a].w+state.ranking[a].d)||1);
+          const rb = state.ranking[b].w/((state.ranking[b].w+state.ranking[b].d)||1);
+          return rb - ra;
+        })[0];
+        el('tab-st-lider').textContent = best + ' (' + state.ranking[best].w + 'V)';
+      } else {
+        el('tab-st-lider').textContent = '—';
+      }
+
+      // score buttons highlight
+      [3, 5, 11].forEach(n => {
+        const sp = el('tab-sc-' + n);
+        if (!sp) return;
+        if (n === (state.winScore || WINNING_SCORE)) {
+          sp.style.borderColor = 'var(--primary)';
+          sp.style.color = 'var(--primary)';
+          sp.style.background = 'var(--primary-dim)';
+        } else {
+          sp.style.borderColor = 'var(--border)';
+          sp.style.color = 'var(--muted)';
+          sp.style.background = 'var(--surface2)';
+        }
+      });
+
+      // queue list
+      const ql = el('tab-queue-list');
+      if (ql) {
+        let rows = '';
+        if (state.match) {
+          rows += `<li style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0;">1</div>
+            <span style="flex:1;font-size:13px;font-weight:600;">${state.match.p1}</span>
+            <span style="font-size:11px;color:var(--primary);background:var(--primary-dim);padding:2px 8px;border-radius:99px;font-weight:700;">jogando</span>
+          </li>`;
+          rows += `<li style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0;">2</div>
+            <span style="flex:1;font-size:13px;font-weight:600;">${state.match.p2}</span>
+            <span style="font-size:11px;color:var(--primary);background:var(--primary-dim);padding:2px 8px;border-radius:99px;font-weight:700;">jogando</span>
+          </li>`;
+        }
+        state.queue.forEach((name, i) => {
+          const pos = (state.match ? 2 : 0) + i + 1;
+          rows += `<li style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">${pos}</div>
+            <span style="flex:1;font-size:13px;font-weight:600;">${name}</span>
+            <button onclick="tabRemove(${i})" style="padding:3px 8px;background:var(--red-dim);color:var(--red);border:1px solid var(--red);border-radius:6px;font-size:11px;cursor:pointer;">✕</button>
+          </li>`;
+        });
+        ql.innerHTML = rows || '<li style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Fila vazia</li>';
+      }
+
+      const canStart = !state.match && state.queue.length >= 2;
+      const sb = el('tab-start-btn');
+      if (sb) sb.style.display = canStart ? 'block' : 'none';
+
+      // match vs waiting
+      const waiting = el('tab-waiting');
+      const matchDiv = el('tab-match');
+      if (!state.match) {
+        if (waiting) waiting.style.display = 'flex';
+        if (matchDiv) matchDiv.style.display = 'none';
+        return;
+      }
+      if (waiting) waiting.style.display = 'none';
+      if (matchDiv) matchDiv.style.display = 'flex';
+
+      const m = state.match;
+      const s1 = m.s1, s2 = m.s2;
+      const target = state.winScore || WINNING_SCORE;
+
+      el('tab-p1name').textContent = m.p1;
+      el('tab-p2name').textContent = m.p2;
+      el('tab-p1score').textContent = s1;
+      el('tab-p2score').textContent = s2;
+
+      // leading color
+      el('tab-p1score').style.color = s1 > s2 ? '#ffffff' : 'var(--primary)';
+      el('tab-p2score').style.color = s2 > s1 ? '#ffffff' : 'var(--primary)';
+      el('tab-area-0').style.background = s1 > s2 ? 'var(--primary-dim)' : 'var(--surface)';
+      el('tab-area-1').style.background = s2 > s1 ? 'var(--primary-dim)' : 'var(--surface2)';
+
+      // serve
+      const server = getServer(m);
+      el('tab-serve-0').style.display = server === m.p1 ? 'block' : 'none';
+      el('tab-serve-1').style.display = server === m.p2 ? 'block' : 'none';
+
+      // match point banner
+      const mp = isMatchPoint(m);
+      const banner = el('tab-mp-banner');
+      if (banner) banner.style.display = mp ? 'block' : 'none';
+
+      // progress dots
+      const prog = el('tab-prog');
+      if (prog) {
+        const dots1 = Array.from({length: target}, (_,i) =>
+          `<div style="flex:1;height:7px;border-radius:4px;background:${i<s1?'var(--primary)':'var(--surface2)'};"></div>`).join('');
+        const dots2 = Array.from({length: target}, (_,i) =>
+          `<div style="flex:1;height:7px;border-radius:4px;background:${i<s2?'#7c7cf5':'var(--surface2)'};"></div>`).join('');
+        prog.innerHTML = dots1 + '<div style="width:18px;flex-shrink:0;"></div>' + dots2;
+      }
+
+      // next player
+      const nxt = el('tab-next');
+      if (nxt) nxt.innerHTML = state.queue.length > 0 ? `🔄 Próximo: <b style="color:var(--primary)">${state.queue[0]}</b>` : '';
+
+      // undo counter
+      const ub = el('tab-undo-btn');
+      if (ub) ub.textContent = state.lastStates.length > 0 ? `↩(${state.lastStates.length})` : '↩';
+
+      // rank tab
+      const rb = el('tab-rank-body');
+      if (rb && rb.closest('[style*="flex"]')) {
+        _tabletRenderRank();
+      }
+    }
+
+    function _tabletRenderRank() {
+      const rb = document.getElementById('tab-rank-body');
+      if (!rb) return;
+      const players = Object.keys(state.ranking);
+      const sorted = [...players].sort((a,b) => {
+        const ra = state.ranking[a].w/((state.ranking[a].w+state.ranking[a].d)||1);
+        const rb2 = state.ranking[b].w/((state.ranking[b].w+state.ranking[b].d)||1);
+        return rb2 - ra || state.ranking[b].w - state.ranking[a].w;
+      });
+      rb.innerHTML = sorted.map((name,i) => {
+        const r = state.ranking[name];
+        const rate = Math.round((r.w/((r.w+r.d)||1))*100);
+        return `<tr>
+          <td style="padding:8px;border-bottom:1px solid var(--border);">${i<3?['🥇','🥈','🥉'][i]:i+1}</td>
+          <td style="padding:8px;border-bottom:1px solid var(--border);font-weight:600;">${name}</td>
+          <td style="padding:8px;border-bottom:1px solid var(--border);">${r.w}V/${r.d}D</td>
+          <td style="padding:8px;border-bottom:1px solid var(--border);color:${rate>=50?'var(--primary)':'var(--red)'};font-weight:700;">${rate}%</td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="4" style="padding:20px;text-align:center;color:var(--muted);">Sem dados</td></tr>';
+    }
+
+    function _tabletRenderHist() {
+      const hl = document.getElementById('tab-hist-list');
+      if (!hl) return;
+      hl.innerHTML = state.history.map((h,i) => `
+        <div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <div>
+            <div style="font-size:10px;color:var(--muted);">#${state.history.length-i} · ${h.time}</div>
+            <div style="font-size:13px;font-weight:600;">${h.players}</div>
+            <div style="font-size:11px;color:var(--primary);">🏆 ${h.win}</div>
+          </div>
+          <div style="font-family:'Bebas Neue', sans-serif;font-size:22px;">${h.score}</div>
+        </div>`).join('') || '<div style="text-align:center;padding:20px;color:var(--muted);">Nenhuma partida ainda</div>';
+    }
+
+    function tabSide(panel) {
+      ['fila','rank','hist'].forEach(p => {
+        const btn = document.getElementById('tab-sb-' + p);
+        const div = document.getElementById('tab-panel-' + p);
+        if (btn) { btn.style.background = p===panel?'var(--primary)':'transparent'; btn.style.color = p===panel?'#000':'var(--muted)'; }
+        if (div) div.style.display = p===panel?'flex':'none';
+      });
+      if (panel === 'rank') _tabletRenderRank();
+      if (panel === 'hist') _tabletRenderHist();
+    }
+
+    function tabAddPlayer() {
+      const input = document.getElementById('tab-input');
+      const name = input.value.trim().toUpperCase();
+      if (!name) return;
+      if (state.queue.includes(name)) { input.value = ''; return; }
+      if (state.match && (state.match.p1 === name || state.match.p2 === name)) { input.value = ''; return; }
+      if (!state.allPlayers.includes(name)) state.allPlayers.push(name);
+      state.queue.push(name);
+      input.value = '';
+      save();
+      renderQueue();   // updates normal UI
+      _tabletRender(); // updates tablet UI
+    }
+
+    function tabRemove(index) {
+      state.queue.splice(index, 1);
+      save();
+      renderQueue();
+      _tabletRender();
+    }
+
+    // tablet updates happen via _tabletRender() calls in original functions below
+
+    // Restore tablet on reload
+    try {
+      if (localStorage.getItem('elt_tablet') === '1') toggleTablet();
+    } catch(e) {}
+
   </script>
+
+  <div id="tablet-overlay" style="display:none; position:fixed; inset:0; z-index:300; background:var(--bg); flex-direction:column; overflow:hidden;">
+
+    <div style="display:flex; align-items:center; padding:8px 16px; background:var(--surface); border-bottom:2px solid var(--border); gap:12px; flex-shrink:0;">
+      <div style="font-family:'Bebas Neue', sans-serif; font-size:24px; color:var(--primary); letter-spacing:2px;">🏓 ELT TT</div>
+      <div id="tab-clock" style="font-family:'Bebas Neue', sans-serif; font-size:28px; color:var(--primary); letter-spacing:3px; flex:1; text-align:center;">00:00:00</div>
+      <button onclick="toggleTheme()" style="width:40px;height:40px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-size:16px;" id="tab-theme-btn">☀️</button>
+      <button onclick="toggleTablet()" style="padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface2);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">✕ Sair</button>
+    </div>
+
+    <div style="display:flex; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0;">
+      <div style="flex:1;text-align:center;padding:5px;border-right:1px solid var(--border);">
+        <div style="font-family:'Bebas Neue', sans-serif;font-size:20px;color:var(--primary);" id="tab-st-partidas">0</div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;">Partidas</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:5px;border-right:1px solid var(--border);">
+        <div style="font-family:'Bebas Neue', sans-serif;font-size:20px;color:var(--primary);" id="tab-st-jogadores">0</div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;">Jogadores</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:5px;border-right:1px solid var(--border);border:1px solid var(--primary);">
+        <div style="font-family:'Bebas Neue', sans-serif;font-size:16px;color:var(--primary);white-space:nowrap;overflow:hidden;" id="tab-st-lider">—</div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;">Líder</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:5px;">
+        <div style="font-family:'Bebas Neue', sans-serif;font-size:20px;color:var(--primary);" id="tab-st-fila">0</div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;">Na Fila</div>
+      </div>
+    </div>
+
+    <div style="flex:1;display:flex;overflow:hidden;min-height:0;">
+
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;border-right:2px solid var(--border);">
+
+        <div id="tab-waiting" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);text-align:center;padding:2rem;">
+          <div style="font-size:60px;">🏓</div>
+          <div style="font-family:'Bebas Neue', sans-serif;font-size:22px;letter-spacing:2px;">Aguardando partida...</div>
+          <div style="font-size:13px;">Adicione jogadores na fila ao lado</div>
+        </div>
+
+        <div id="tab-match" style="display:none;flex-direction:column;flex:1;min-height:0;">
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;min-height:38px;">
+            <div id="tab-mp-banner" style="display:none;background:linear-gradient(135deg,var(--primary),#e65100);color:#000;font-family:'Bebas Neue', sans-serif;font-size:15px;letter-spacing:2px;padding:3px 14px;border-radius:99px;pointer-events:none;">⚡ MATCH POINT ⚡</div>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:11px;color:var(--muted);">⏱</span>
+              <span id="tab-timer" style="font-family:'Bebas Neue', sans-serif;font-size:20px;color:var(--primary);">00:00</span>
+              <span id="tab-next" style="font-size:12px;color:var(--muted);margin-left:6px;"></span>
+            </div>
+          </div>
+
+          <div id="tab-prog" style="display:flex;gap:4px;padding:5px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;pointer-events:none;"></div>
+
+          <div style="flex:1;display:flex;min-height:0;">
+
+            <div id="tab-area-0" onclick="handlePoint(0)" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;background:var(--surface);gap:4px;">
+              <div id="tab-p1name" style="font-family:'DM Sans', sans-serif;font-size:clamp(14px,2.5vw,22px);font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:2px;">P1</div>
+              <div id="tab-p1score" style="font-family:'Bebas Neue', sans-serif;font-size:clamp(100px,15vw,200px);line-height:0.9;color:var(--primary);">0</div>
+              <div id="tab-serve-0" style="display:none;background:var(--primary);color:#000;font-size:11px;font-weight:700;padding:3px 12px;border-radius:99px;pointer-events:none;">🏓 Saque</div>
+              <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;opacity:0.4;pointer-events:none;">Toque para pontuar</div>
+            </div>
+
+            <div style="width:50px;display:flex;align-items:center;justify-content:center;background:var(--bg);flex-shrink:0;">
+              <span style="font-family:'Bebas Neue', sans-serif;font-size:24px;color:var(--border);">VS</span>
+            </div>
+
+            <div id="tab-area-1" onclick="handlePoint(1)" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;background:var(--surface2);gap:4px;">
+              <div id="tab-p2name" style="font-family:'DM Sans', sans-serif;font-size:clamp(14px,2.5vw,22px);font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:2px;">P2</div>
+              <div id="tab-p2score" style="font-family:'Bebas Neue', sans-serif;font-size:clamp(100px,15vw,200px);line-height:0.9;color:var(--primary);">0</div>
+              <div id="tab-serve-1" style="display:none;background:var(--primary);color:#000;font-size:11px;font-weight:700;padding:3px 12px;border-radius:99px;pointer-events:none;">🏓 Saque</div>
+              <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;opacity:0.4;pointer-events:none;">Toque para pontuar</div>
+            </div>
+
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:center;gap:20px;padding:10px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <button id="tab-undo-btn" onclick="undo()" style="width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);font-size:18px;cursor:pointer;">↩</button>
+              <span style="font-size:9px;color:var(--muted);text-transform:uppercase;">Desfazer</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <button onclick="swapSides()" style="width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);font-size:18px;cursor:pointer;">⇄</button>
+              <span style="font-size:9px;color:var(--muted);text-transform:uppercase;">Trocar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <button onclick="pauseMatch()" style="width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);font-size:18px;cursor:pointer;">⏸</button>
+              <span style="font-size:9px;color:var(--muted);text-transform:uppercase;">Pausar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <button onclick="cancelMatch()" style="width:44px;height:44px;border-radius:50%;border:1.5px solid var(--red);background:var(--red-dim);color:var(--red);font-size:18px;cursor:pointer;">✕</button>
+              <span style="font-size:9px;color:var(--muted);text-transform:uppercase;">Cancelar</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="width:270px;min-width:200px;display:flex;flex-direction:column;background:var(--surface);overflow:hidden;flex-shrink:0;">
+
+        <div style="display:flex;border-bottom:2px solid var(--border);flex-shrink:0;">
+          <button onclick="tabSide('fila')" id="tab-sb-fila" style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;cursor:pointer;background:var(--primary);color:#000;border:none;font-family:'DM Sans',sans-serif;">👥 Fila</button>
+          <button onclick="tabSide('rank')" id="tab-sb-rank" style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);border:none;font-family:'DM Sans',sans-serif;">🏆 Rank</button>
+          <button onclick="tabSide('hist')" id="tab-sb-hist" style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);border:none;font-family:'DM Sans',sans-serif;">📜 Hist.</button>
+        </div>
+
+        <div id="tab-panel-fila" style="display:flex;flex-direction:column;flex:1;overflow:hidden;padding:10px;">
+          <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <input type="text" id="tab-input" placeholder="Nome do jogador..."
+              onkeydown="if(event.key==='Enter')tabAddPlayer()"
+              style="flex:1;min-width:0;height:42px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);padding:0 12px;font-size:14px;outline:none;font-family:'DM Sans',sans-serif;">
+            <button onclick="tabAddPlayer()" style="width:42px;height:42px;border-radius:10px;background:var(--primary);border:none;font-size:20px;cursor:pointer;font-weight:700;color:#000;flex-shrink:0;">+</button>
+          </div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Pontuação</div>
+          <div style="display:flex;gap:6px;margin-bottom:10px;">
+            <label style="flex:1;"><input type="radio" name="tab-score" value="3" onchange="setScore(3)" style="display:none;"><span id="tab-sc-3" style="display:block;text-align:center;padding:10px 0;border:1.5px solid var(--border);border-radius:10px;font-family:'Bebas Neue', sans-serif;font-size:18px;color:var(--muted);cursor:pointer;background:var(--surface2);">3</span></label>
+            <label style="flex:1;"><input type="radio" name="tab-score" value="5" onchange="setScore(5)" checked style="display:none;"><span id="tab-sc-5" style="display:block;text-align:center;padding:10px 0;border:1.5px solid var(--primary);border-radius:10px;font-family:'Bebas Neue', sans-serif;font-size:18px;color:var(--primary);cursor:pointer;background:var(--primary-dim);">5</span></label>
+            <label style="flex:1;"><input type="radio" name="tab-score" value="11" onchange="setScore(11)" style="display:none;"><span id="tab-sc-11" style="display:block;text-align:center;padding:10px 0;border:1.5px solid var(--border);border-radius:10px;font-family:'Bebas Neue', sans-serif;font-size:18px;color:var(--muted);cursor:pointer;background:var(--surface2);">11</span></label>
+          </div>
+          <ul id="tab-queue-list" style="list-style:none;flex:1;overflow-y:auto;margin:0;padding:0;"></ul>
+          <button id="tab-start-btn" onclick="startMatch()" style="display:none;margin-top:8px;width:100%;padding:14px;background:var(--primary);color:#000;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;">▶ Iniciar Partida</button>
+          <hr style="border:0;border-top:1px solid var(--border);margin:10px 0;flex-shrink:0;">
+          <button onclick="resetDay()" style="width:100%;padding:8px;background:transparent;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;">♻ Resetar Tudo</button>
+        </div>
+
+        <div id="tab-panel-rank" style="display:none;flex-direction:column;flex:1;overflow:hidden;padding:10px;">
+          <div style="overflow-y:auto;flex:1;">
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+              <thead><tr>
+                <th style="text-align:left;color:var(--muted);font-size:10px;padding:8px;border-bottom:1px solid var(--border);">Pos</th>
+                <th style="text-align:left;color:var(--muted);font-size:10px;padding:8px;border-bottom:1px solid var(--border);">Jogador</th>
+                <th style="text-align:left;color:var(--muted);font-size:10px;padding:8px;border-bottom:1px solid var(--border);">V/D</th>
+                <th style="text-align:left;color:var(--muted);font-size:10px;padding:8px;border-bottom:1px solid var(--border);">%</th>
+              </tr></thead>
+              <tbody id="tab-rank-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tab-panel-hist" style="display:none;flex-direction:column;flex:1;overflow:hidden;padding:10px;">
+          <div id="tab-hist-list" style="overflow-y:auto;flex:1;font-size:13px;"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
