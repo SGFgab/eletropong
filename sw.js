@@ -1,5 +1,4 @@
-// Mude este número (ex: v3, v4) SEMPRE que fizer uma alteração no seu index.html
-const CACHE_NAME = 'elt-tt-cache-v2'; 
+const CACHE_NAME = 'elt-tt-cache-v3'; 
 
 const ASSETS_TO_CACHE = [
   './',

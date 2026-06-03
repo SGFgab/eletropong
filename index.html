@@ -196,7 +196,7 @@
       height: 50px;
     }
     input[type=text]:focus { border-color: var(--primary); }
-    .btn { padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--surface2); color: var(--text); font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; white-space: nowrap; flex-shrink: 0; }
+    .btn { padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--surface2); color: var(--text); font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; white-space: nowrap; flex-shrink: 0; height: 44px; white-space: nowrap; flex-shrink: 0; }
     .btn:active { transform: scale(0.97); opacity: 0.85; }
     .btn.primary { background: var(--primary); color: var(--primary-text); border-color: var(--primary); }
     .btn.danger { background: var(--red-dim); color: var(--red); border-color: var(--red); }
@@ -885,7 +885,6 @@
     ═══════════════════════════════════════════════════════════ */
     function openQRModal() {
       const currentUrl = window.location.href;
-      // Usando API pública de geração de QR Code limpa e reativa
       const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(currentUrl)}`;
       
       document.getElementById('qr-frame-target').innerHTML = `<img src="${qrApiUrl}" alt="QR Code do App">`;
@@ -929,7 +928,6 @@
       txtContent += `\n==================================================\n`;
       txtContent += `Gerado automaticamente pelo Eletropong. Bora pra próxima!`;
 
-      // Criação nativa do arquivo para download imediato
       const blob = new Blob([txtContent], { type: "text/plain;charset=utf-8" });
       const tempLink = document.createElement("a");
       tempLink.href = URL.createObjectURL(blob);
@@ -949,7 +947,6 @@
         if (!state.allPlayers) state.allPlayers = [...state.queue];
         if (!state.sessionStart) state.sessionStart = Date.now();
         if (!state.lastStates) state.lastStates = [];
-        // Se havia partida pausada, limpar flag de pausa ao recarregar
         if (state.match && state.match.pausedAt) {
           const pausedDuration = Date.now() - state.match.pausedAt;
           state.match.startTime += pausedDuration;
@@ -962,7 +959,6 @@
       updateClock();
       setInterval(updateClock, 1000);
       refreshAll();
-      // Retomar timer se havia partida ativa salva
       if (state.match) startMatchTimer();
       if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
     }
@@ -1114,10 +1110,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       MATCH (LOGIC WITH 2-POINT ADVANTAGE RULE / DEUCE)
-    ═══════════════════════════════════════════════════════════ */
-    /* ═══════════════════════════════════════════════════════════
-       MATCH TIMER
+       MATCH LOGIC
     ═══════════════════════════════════════════════════════════ */
     function startMatchTimer() {
       clearInterval(matchTimerInterval);
@@ -1136,22 +1129,15 @@
       matchTimerInterval = null;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       SERVE CALCULATOR (troca a cada 2 pontos, deuce = 1 a 1)
-    ═══════════════════════════════════════════════════════════ */
     function getServer(match) {
       const total = match.s1 + match.s2;
       const target = WINNING_SCORE;
-      // No deuce, saque troca a cada ponto
       if (match.s1 >= target - 1 && match.s2 >= target - 1) {
         return total % 2 === 0 ? match.p1 : match.p2;
       }
       return Math.floor(total / 2) % 2 === 0 ? match.p1 : match.p2;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       MATCH POINT DETECTOR
-    ═══════════════════════════════════════════════════════════ */
     function isMatchPoint(match) {
       const { s1, s2 } = match;
       const t = WINNING_SCORE;
@@ -1197,19 +1183,16 @@
         ? `🔄 Próximo na fila: <span>${state.queue[0]}</span>`
         : '';
 
-      // Saque
       const server = getServer(state.match);
       const serveEl = document.getElementById('serve-indicator');
       const serveNameEl = document.getElementById('serve-name');
       serveEl.classList.add('show');
       serveNameEl.textContent = server;
 
-      // Match point banner
       const banner = document.getElementById('match-point-banner');
       if (isMatchPoint(state.match)) banner.classList.add('show');
       else banner.classList.remove('show');
 
-      // Undo counter hint
       const undoBtn = document.querySelector('button[onclick="undo()"]');
       if (undoBtn) {
         const n = state.lastStates.length;
@@ -1220,9 +1203,7 @@
 
     function handlePoint(playerIndex) {
       if (!state.match) return;
-      // Vibração de feedback tátil
       if (navigator.vibrate) navigator.vibrate(30);
-      // Pilha de undo (máx 10)
       state.lastStates.push(JSON.parse(JSON.stringify(state.match)));
       if (state.lastStates.length > 10) state.lastStates.shift();
       
@@ -1318,7 +1299,6 @@
     function pauseMatch() {
       if (!state.match) return;
       stopMatchTimer();
-      // Guardar tempo pausado para compensar ao retomar
       state.match.pausedAt = Date.now();
       save();
       const m = state.match;
@@ -1333,7 +1313,6 @@
 
     function resumeMatch() {
       if (state.match && state.match.pausedAt) {
-        // Deslocar o startTime pelo tempo pausado
         const pausedDuration = Date.now() - state.match.pausedAt;
         state.match.startTime += pausedDuration;
         delete state.match.pausedAt;
@@ -1363,14 +1342,11 @@
     ═══════════════════════════════════════════════════════════ */
     function swapSides() {
       if (!state.match) return;
-      // Trocar jogadores e pontuações
       [state.match.p1, state.match.p2] = [state.match.p2, state.match.p1];
       [state.match.s1, state.match.s2] = [state.match.s2, state.match.s1];
-      // Vibração dupla para sinalizar a troca
       if (navigator.vibrate) navigator.vibrate([40, 60, 40]);
       save();
       renderMatch();
-      // Flash visual no scoreboard inteiro
       const scoreboard = document.querySelector('.scoreboard');
       if (scoreboard) {
         scoreboard.classList.remove('swap-flash');
@@ -1467,17 +1443,30 @@
     init();
 
     /* ═══════════════════════════════════════════════════════════
-       KEYBOARD SHORTCUTS
+       KEYBOARD & BLUETOOTH REMOTE SHORTCUTS
     ═══════════════════════════════════════════════════════════ */
     document.addEventListener('keydown', function(e) {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
-      if (e.key === '1' && state.match && !modalOpen) handlePoint(0);
-      else if (e.key === '2' && state.match && !modalOpen) handlePoint(1);
-      else if (e.key === 'Enter' && modalOpen) {
-        if(document.getElementById('qr-modal').style.display === 'block') {
-          closeQRModal();
-        } else {
-          closeWinner();
+
+      const isKeyP1 = e.key === '1' || e.key === 'AudioVolumeUp' || e.key === 'VolumeUp';
+      const isKeyP2 = e.key === '2' || e.key === 'AudioVolumeDown' || e.key === 'VolumeDown';
+
+      if (state.match && !modalOpen) {
+        if (isKeyP1) {
+          e.preventDefault();
+          handlePoint(0);
+        } else if (isKeyP2) {
+          e.preventDefault();
+          handlePoint(1);
+        }
+      } else if (modalOpen) {
+        if (e.key === 'Enter' || isKeyP1 || isKeyP2) {
+          e.preventDefault();
+          if(document.getElementById('qr-modal').style.display === 'block') {
+            closeQRModal();
+          } else {
+            closeWinner();
+          }
         }
       }
     });
@@ -1560,7 +1549,6 @@
     showTrivia();
     setInterval(showTrivia, 18000);
 
-
     /* ═══════════════════════════════════════════════════════════
        TABLET MODE
     ═══════════════════════════════════════════════════════════ */
@@ -1580,10 +1568,8 @@
     }
 
     function _tabletTick() {
-      // clock
       const cl = document.getElementById('tab-clock');
       if (cl) cl.textContent = new Date().toLocaleTimeString('pt-BR');
-      // match timer sync
       const src = document.getElementById('match-time-val');
       const dst = document.getElementById('tab-timer');
       if (src && dst) dst.textContent = src.textContent;
@@ -1592,7 +1578,6 @@
     function _tabletRender() {
       if (!_tabletActive) return;
 
-      // stats
       const players = Object.keys(state.ranking);
       const el = (id) => document.getElementById(id);
       el('tab-st-partidas').textContent = state.history.length;
@@ -1609,7 +1594,6 @@
         el('tab-st-lider').textContent = '—';
       }
 
-      // score buttons highlight
       [3, 5, 11].forEach(n => {
         const sp = el('tab-sc-' + n);
         if (!sp) return;
@@ -1624,7 +1608,6 @@
         }
       });
 
-      // queue list
       const ql = el('tab-queue-list');
       if (ql) {
         let rows = '';
@@ -1655,7 +1638,6 @@
       const sb = el('tab-start-btn');
       if (sb) sb.style.display = canStart ? 'block' : 'none';
 
-      // match vs waiting
       const waiting = el('tab-waiting');
       const matchDiv = el('tab-match');
       if (!state.match) {
@@ -1675,23 +1657,19 @@
       el('tab-p1score').textContent = s1;
       el('tab-p2score').textContent = s2;
 
-      // leading color
       el('tab-p1score').style.color = s1 > s2 ? '#ffffff' : 'var(--primary)';
       el('tab-p2score').style.color = s2 > s1 ? '#ffffff' : 'var(--primary)';
       el('tab-area-0').style.background = s1 > s2 ? 'var(--primary-dim)' : 'var(--surface)';
       el('tab-area-1').style.background = s2 > s1 ? 'var(--primary-dim)' : 'var(--surface2)';
 
-      // serve
       const server = getServer(m);
       el('tab-serve-0').style.display = server === m.p1 ? 'block' : 'none';
       el('tab-serve-1').style.display = server === m.p2 ? 'block' : 'none';
 
-      // match point banner
       const mp = isMatchPoint(m);
       const banner = el('tab-mp-banner');
       if (banner) banner.style.display = mp ? 'block' : 'none';
 
-      // progress dots
       const prog = el('tab-prog');
       if (prog) {
         const dots1 = Array.from({length: target}, (_,i) =>
@@ -1701,15 +1679,12 @@
         prog.innerHTML = dots1 + '<div style="width:18px;flex-shrink:0;"></div>' + dots2;
       }
 
-      // next player
       const nxt = el('tab-next');
       if (nxt) nxt.innerHTML = state.queue.length > 0 ? `🔄 Próximo: <b style="color:var(--primary)">${state.queue[0]}</b>` : '';
 
-      // undo counter
       const ub = el('tab-undo-btn');
       if (ub) ub.textContent = state.lastStates.length > 0 ? `↩(${state.lastStates.length})` : '↩';
 
-      // rank tab
       const rb = el('tab-rank-body');
       if (rb && rb.closest('[style*="flex"]')) {
         _tabletRenderRank();
@@ -1772,8 +1747,8 @@
       state.queue.push(name);
       input.value = '';
       save();
-      renderQueue();   // updates normal UI
-      _tabletRender(); // updates tablet UI
+      renderQueue();
+      _tabletRender();
     }
 
     function tabRemove(index) {
@@ -1783,9 +1758,6 @@
       _tabletRender();
     }
 
-    // tablet updates happen via _tabletRender() calls in original functions below
-
-    // Restore tablet on reload
     try {
       if (localStorage.getItem('elt_tablet') === '1') toggleTablet();
     } catch(e) {}
@@ -1793,7 +1765,6 @@
   </script>
 
   <div id="tablet-overlay" style="display:none; position:fixed; inset:0; z-index:300; background:var(--bg); flex-direction:column; overflow:hidden;">
-
     <div style="display:flex; align-items:center; padding:8px 16px; background:var(--surface); border-bottom:2px solid var(--border); gap:12px; flex-shrink:0;">
       <div style="font-family:'Bebas Neue', sans-serif; font-size:24px; color:var(--primary); letter-spacing:2px;">🏓 ELT TT</div>
       <div id="tab-clock" style="font-family:'Bebas Neue', sans-serif; font-size:28px; color:var(--primary); letter-spacing:3px; flex:1; text-align:center;">00:00:00</div>
@@ -1821,9 +1792,7 @@
     </div>
 
     <div style="flex:1;display:flex;overflow:hidden;min-height:0;">
-
       <div style="flex:1;display:flex;flex-direction:column;min-width:0;border-right:2px solid var(--border);">
-
         <div id="tab-waiting" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);text-align:center;padding:2rem;">
           <div style="font-size:60px;">🏓</div>
           <div style="font-family:'Bebas Neue', sans-serif;font-size:22px;letter-spacing:2px;">Aguardando partida...</div>
@@ -1831,7 +1800,6 @@
         </div>
 
         <div id="tab-match" style="display:none;flex-direction:column;flex:1;min-height:0;">
-
           <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;min-height:38px;">
             <div id="tab-mp-banner" style="display:none;background:linear-gradient(135deg,var(--primary),#e65100);color:#000;font-family:'Bebas Neue', sans-serif;font-size:15px;letter-spacing:2px;padding:3px 14px;border-radius:99px;pointer-events:none;">⚡ MATCH POINT ⚡</div>
             <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
@@ -1844,7 +1812,6 @@
           <div id="tab-prog" style="display:flex;gap:4px;padding:5px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;pointer-events:none;"></div>
 
           <div style="flex:1;display:flex;min-height:0;">
-
             <div id="tab-area-0" onclick="handlePoint(0)" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;background:var(--surface);gap:4px;">
               <div id="tab-p1name" style="font-family:'DM Sans', sans-serif;font-size:clamp(14px,2.5vw,22px);font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:2px;">P1</div>
               <div id="tab-p1score" style="font-family:'Bebas Neue', sans-serif;font-size:clamp(100px,15vw,200px);line-height:0.9;color:var(--primary);">0</div>
@@ -1862,7 +1829,6 @@
               <div id="tab-serve-1" style="display:none;background:var(--primary);color:#000;font-size:11px;font-weight:700;padding:3px 12px;border-radius:99px;pointer-events:none;">🏓 Saque</div>
               <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;opacity:0.4;pointer-events:none;">Toque para pontuar</div>
             </div>
-
           </div>
 
           <div style="display:flex;align-items:center;justify-content:center;gap:20px;padding:10px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;">
@@ -1883,12 +1849,10 @@
               <span style="font-size:9px;color:var(--muted);text-transform:uppercase;">Cancelar</span>
             </div>
           </div>
-
         </div>
       </div>
 
       <div style="width:270px;min-width:200px;display:flex;flex-direction:column;background:var(--surface);overflow:hidden;flex-shrink:0;">
-
         <div style="display:flex;border-bottom:2px solid var(--border);flex-shrink:0;">
           <button onclick="tabSide('fila')" id="tab-sb-fila" style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;cursor:pointer;background:var(--primary);color:#000;border:none;font-family:'DM Sans',sans-serif;">👥 Fila</button>
           <button onclick="tabSide('rank')" id="tab-sb-rank" style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);border:none;font-family:'DM Sans',sans-serif;">🏆 Rank</button>
@@ -1931,7 +1895,6 @@
         <div id="tab-panel-hist" style="display:none;flex-direction:column;flex:1;overflow:hidden;padding:10px;">
           <div id="tab-hist-list" style="overflow-y:auto;flex:1;font-size:13px;"></div>
         </div>
-
       </div>
     </div>
   </div>
