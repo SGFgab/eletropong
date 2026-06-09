@@ -1,50 +1,40 @@
-const CACHE_NAME = 'elt-tt-cache-v3'; 
-
-const ASSETS_TO_CACHE = [
+const CACHE_NAME = 'elt-tt-v2';
+const ASSETS = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap'
 ];
 
-// Instalação: Salva os arquivos iniciais no cache
-self.addEventListener('install', (event) => {
-  event.waitUntil(
+// Instalação do Service Worker e armazenamento dos arquivos no cache
+self.addEventListener('install', (e) => {
+  e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+      return cache.addAll(ASSETS);
+    }).then(() => self.skipWaiting())
   );
-  // Força o novo Service Worker a assumir o controle imediatamente
-  self.skipWaiting(); 
 });
 
-// Ativação: Limpa os caches antigos se o CACHE_NAME mudar
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
+// Ativação e limpeza de caches antigos
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then((keys) => {
       return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Limpando cache antigo:', cacheName);
-            return caches.delete(cacheName);
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim(); // Atualiza todas as abas abertas do app
 });
 
-// Interceptação (Network First): Tenta a internet primeiro, se falhar usa o cache
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        // Se a internet funcionar, retorna a versão mais recente do GitHub
-        return networkResponse;
-      })
-      .catch(() => {
-        // Se estiver offline, retorna a versão salva no cache
-        return caches.match(event.request);
-      })
+// Intercepta as requisições: tenta rede primeiro, se falhar (offline), busca no cache
+self.addEventListener('fetch', (e) => {
+  e.respondWith(
+    fetch(e.request).catch(() => {
+      return caches.match(e.request);
+    })
   );
 });
