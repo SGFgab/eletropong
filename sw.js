@@ -1,4 +1,4 @@
-const CACHE_NAME = 'elt-tt-v2';
+const CACHE_NAME = 'elt-tt-cache-v2';
 const ASSETS = [
   './',
   './index.html',
