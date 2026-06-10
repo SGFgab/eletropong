@@ -1,7 +1,7 @@
 {
   "name": "ELT TT Tournament",
   "short_name": "Eletropong",
-  "description": "Sistema de gerenciamento de torneio e placar de ping-pong.",
+  "description": "Placar e gerenciador de torneios de tênis de mesa.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0e0e0e",
@@ -9,16 +9,16 @@
   "orientation": "any",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3566/3566345.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3222/3222662.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3566/3566345.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3222/3222662.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }

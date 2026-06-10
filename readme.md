@@ -1,40 +1,62 @@
-# 🏓 ELT TT Tournament
+# 🏓 ELT TT Tournament (Eletropong)
 
-O **ELT TT Tournament** (Eletropong) é uma aplicação web moderna e responsiva (PWA) projetada para automatizar, gerir e marcar pontos em torneios casuais de ténis de mesa (ping-pong). Conta com suporte nativo para dispositivos móveis, computadores e um **Modo Tablet** dedicado para visualização na lateral da mesa.
-
----
-
-## 🚀 Novidades e Funcionalidades Atuais
-
-- **📱 Suporte Total PWA (Offline):** Graças ao Service Worker (`sw.js`) e ao manifesto, o site pode ser instalado no ecrã inicial do telemóvel ou tablet e funciona **totalmente sem internet**.
-- **⬜ Modo Tablet Avançado:** Interface adaptada para ecrãs maiores colocados ao lado da mesa de jogo. Inclui um painel lateral dinâmico para gerir a fila, ver o ranking do dia ou o histórico em tempo real sem interromper o placar.
-- **🔄 Lógica de Saque Blindada:** O indicador de serviço atualiza dinamicamente e de forma inteligente (de 2 em 2 pontos ou de 1 em 1 nas vantagens). Mesmo ao usar a função **"Trocar Lados"**, o marcador sabe exatamente quem está a sacar no plano real.
-- **↩️ Sistema de Undo Avançado:** Permite desfazer até os últimos 10 pontos marcados para corrigir erros de arbitragem rapidamente.
-- **⚡ Validação e UX Fluida:** Inputs de texto contam com animações de feedback visual (*shake/tremor*) em caso de nomes duplicados ou inválidos. O botão de cancelar partida agora exige confirmação para evitar cliques acidentais.
-- **📊 Estatísticas Avançadas e Exportação:** O rodapé monitoriza métricas como média de pontos por partida, maior sequência de vitórias e a partida mais disputada. O ranking pode ser exportado instantaneamente num ficheiro `.txt`.
-- **🔊 Feedback Sonoro e Tátil Nativo:** Utiliza a API de Áudio Web para gerar efeitos sonoros sintéticos de batida de bola e vitória, além de vibração no dispositivo (se suportado).
-- **🌓 Temas Dinâmicos:** Alternância rápida entre Modo Escuro e Modo Claro com persistência local (`localStorage`).
-- **💡 Curiosidades Semanais:** Sistema integrado que exibe factos e curiosidades sobre a história do ténis de mesa mundial no rodapé.
+Um sistema completo, leve e responsivo para gerenciamento e marcação de pontos em torneios de tênis de mesa (Ping Pong). Desenvolvido com foco em usabilidade mobile, modo tablet e controle rápido de sets, ideal para telas de LED ou dispositivos operados na beira da mesa.
 
 ---
 
-## ⌨️ Atalhos de Teclado e Controlo Remoto
+## ✨ Funcionalidades Principais
 
-O sistema está preparado para ser controlado à distância por mini-teclados ou comandos Bluetooth (como os que simulam botões de volume):
-
-| Comando / Tecla | Ação Executada |
-| :--- | :--- |
-| `1` ou `Volume Up` | Marca ponto para o **Jogador 1** (Esquerda) |
-| `2` ou `Volume Down` | Marca ponto para o **Jogador 2** (Direita) |
-| `Enter` | Fecha o ecrã de vitória e inicia automaticamente o próximo jogo da fila |
+* **👥 Gerenciamento de Fila Dinâmico:** Adicione e remova jogadores facilmente. O app gerencia automaticamente quem está jogando e quem é o próximo da vez.
+* **▶️ Painel de Partida Completo:** Visualização clara da pontuação atual, histórico de pontos do set (bolinhas de progresso), indicador de saque automático e alertas de *Match Point*.
+* **🏆 Ranking Automatizado:** Tabela de classificação baseada em aproveitamento (Vitórias/Derrotas) com opção de exportar o relatório do dia em formato `.txt`.
+* **📜 Histórico de Sets:** Registro completo de todas as partidas finalizadas, incluindo placar, duração do set e horário.
+* **⬜ Modo Tablet:** Interface dedicada para telas maiores montadas em suportes na mesa, otimizando o espaço para visualização dos atletas.
 
 ---
 
-## 📁 Estrutura do Projeto
+## ⚡ Novas Implementações Importantes
 
-Para o funcionamento correto de todas as tecnologias (especialmente a instalação offline), a pasta do projeto deve conter:
+### 1. 🕶️ Modo Contra a Luz (Filtro de Alto Contraste)
+Pensado para jogos em ambientes externos ou sob refletores intensos onde o reflexo da tela dificulta a leitura. O botão de tema agora alterna ciclicamente entre três estados:
+* **Modo Escuro:** Visual moderno com fundo escuro.
+* **Modo Claro:** Interface limpa com tons pastéis.
+* **Modo Contra a Luz:** Força contraste absoluto (Fundo `#ffffff` puro e textos/números em `#000000` absoluto), garantindo leitura cristalina mesmo sob a luz direta do sol. *Disponível em todas as telas, incluindo o Placar Rápido e Modo Tablet.*
 
-```text
-├── index.html       # Interface, estilos e lógica principal do torneio
-├── manifest.json    # Configurações de instalação do PWA e ícones
-└── sw.js            # Service Worker para controlo de cache offline
+### 2. ⚙️ Chave de Vantagem (Tie-Break Opcional)
+Agora o organizador pode escolher como a partida termina através do toggle **"Exigir diferença de 2 pts (Tie-Break)"**:
+* **Ativado (Padrão):** Segue a regra oficial. Se o jogo empatar no limite (ex: 4x4 ou 10x10), a partida continua até que um jogador abra 2 pontos de vantagem.
+* **Desativado:** Modo "Sudden Death". Quem alcançar a pontuação máxima escolhida (3, 5 ou 11) primeiro ganha o set imediatamente (ex: 5x4 encerra o jogo).
+
+### 3. ⚡ Placar Rápido Totalmente Integrado
+O modo de marcação cru (sem necessidade de registro de nomes) foi atualizado para uma experiência de primeira classe:
+* Herda instantaneamente o tema global ativo (como o modo Contra a Luz).
+* Respeita a configuração ativa de Tie-Break.
+* Inclui um banner dinâmico de *Match Point* para aumentar a emoção na hora decisiva.
+
+---
+
+## 🛠️ Atalhos de Teclado & Controle Remoto
+
+O app é compatível com mini-teclados sem fio e controles bluetooth (passadores de slide/remotos de selfie adaptados):
+
+* **Tecla `1` ou Volume `+`:** Ponto para o Jogador 1 / Lado Esquerdo.
+* **Tecla `2` ou Volume `-`:** Ponto para o Jogador 2 / Lado Direito.
+* **Tecla `Enter`:** Fecha a tela de vitória e inicia a próxima partida da fila.
+
+---
+
+## 🚀 Como Executar
+
+Por ser um sistema construído puramente em **HTML5, CSS3 e JavaScript**, ele não precisa de compilação ou servidores complexos:
+
+1. Baixe o arquivo `index.html`.
+2. Dê um duplo clique no arquivo para abrir em qualquer navegador moderno (Chrome, Safari, Edge, Firefox).
+3. Para salvar os dados localmente, o app utiliza o `localStorage` do navegador. Os jogadores e o ranking não somem ao atualizar a página.
+
+---
+
+## 💾 Tecnologias Utilizadas
+
+* **Linguagens:** HTML5, CSS3 (CSS Variables para os Temas), JavaScript (ES6+).
+* **Fontes:** Google Fonts (*Bebas Neue* e *DM Sans*).
+* **Áudio:** Web Audio API (Sintetizador nativo para efeitos sonoros de pontos e vitória sem arquivos externos).

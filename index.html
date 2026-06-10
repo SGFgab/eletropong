@@ -41,14 +41,49 @@
       --muted: #9a8870;
       --shadow: rgba(0,0,0,0.12);
     }
+    /* MODO CONTRA A LUZ (ALTO CONTRASTE ABSOLUTO) */
+    body.theme-high-contrast {
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --surface2: #ffffff;
+      --border: #000000;
+      --primary: #000000;
+      --primary-dim: #eeeeee;
+      --primary-text: #ffffff;
+      --secondary: #000000;
+      --red: #000000;
+      --red-dim: #eeeeee;
+      --text: #000000;
+      --muted: #000000;
+      --shadow: transparent;
+    }
+    body.theme-high-contrast .score-num,
+    body.theme-high-contrast .fast-num {
+      color: #000000 !important;
+      text-shadow: none !important;
+    }
+    body.theme-high-contrast .score-num.leading,
+    body.theme-high-contrast .fast-num.leading {
+      text-decoration: underline;
+    }
+    body.theme-high-contrast .score-opt {
+      font-weight: bold;
+    }
+    body.theme-high-contrast #fast-overlay {
+      background: #ffffff !important;
+    }
+    body.theme-high-contrast .fast-area {
+      background: #ffffff !important;
+      border: 2px solid #000000;
+    }
 
     /* ── THEME TRANSITION ───────────────────────────────────── */
     *, *::before, *::after {
       box-sizing: border-box; margin: 0; padding: 0;
       -webkit-tap-highlight-color: transparent;
-      transition: background-color 1.2s ease, border-color 1.2s ease, color 1.2s ease;
+      transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease;
     }
-    .point-anim, .prog-dot, .score-num, .tab, .btn { transition: background-color 1.2s ease, border-color 1.2s ease, color 1.2s ease, transform 0.1s ease; }
+    .point-anim, .prog-dot, .score-num, .fast-num, .tab, .btn { transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, transform 0.1s ease; }
 
     body {
       background: var(--bg);
@@ -217,8 +252,8 @@
     .btn.full { width: 100%; }
     .btn.lg { min-height: 58px; height: auto; font-size: 16px; padding: 16px 20px; }
 
-    /* ── SCORE SELECTOR ─────────────────────────────────────── */
-    .score-selector { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+    /* ── SCORE SELECTOR & CONFIG ────────────────────────────── */
+    .score-selector { display: flex; gap: 8px; margin-bottom: 0.75rem; }
     .score-selector label { flex: 1; }
     .score-selector input[type=radio] { display: none; }
     .score-opt {
@@ -230,6 +265,36 @@
     .score-selector input[type=radio]:checked + .score-opt {
       border-color: var(--primary); color: var(--primary); background: var(--primary-dim);
     }
+    
+    .config-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin-bottom: 1.25rem;
+    }
+    .config-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .switch {
+      position: relative; display: inline-block; width: 44px; height: 24px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; inset: 0; background-color: var(--border);
+      transition: .3s; border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px;
+      background-color: #fff; transition: .3s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--primary); }
+    input:checked + .slider:before { transform: translateX(20px); }
 
     /* ── SCOREBOARD ─────────────────────────────────────────── */
     .scoreboard {
@@ -469,7 +534,7 @@
     .swap-flash { animation: swapFlash 0.4s ease-out; }
 
     /* ── MATCH POINT BANNER ─────────────────────────────────── */
-    #match-point-banner {
+    #match-point-banner, #fast-mp-banner {
       display: none;
       background: linear-gradient(135deg, var(--primary), #e65100);
       color: #000;
@@ -482,7 +547,7 @@
       margin-bottom: 10px;
       animation: matchPointPulse 0.7s ease infinite alternate;
     }
-    #match-point-banner.show { display: block; }
+    #match-point-banner.show, #fast-mp-banner.show { display: block; }
     @keyframes matchPointPulse {
       from { opacity: 1; transform: scale(1); }
       to   { opacity: 0.85; transform: scale(1.02); }
@@ -569,9 +634,9 @@
   <header>
     <div class="logo-text">🏓 ELT TT TOURNAMENT</div>
     <div class="header-center">
-      <button class="theme-toggle-btn" onclick="toggleTheme()" id="theme-btn">
+      <button class="theme-toggle-btn" onclick="rotateTheme()" id="theme-btn">
         <span id="theme-icon">☀️</span>
-        <span id="theme-label" class="btn-label">Modo Claro</span>
+        <span id="theme-label" class="btn-label">Tema: Escuro</span>
       </button>
       <button class="theme-toggle-btn" id="fast-btn" onclick="toggleFastScore()" style="border-color: var(--primary); color: var(--primary); background: var(--primary-dim)">
         <span>⚡</span><span class="btn-label">Placar Rápido</span>
@@ -628,6 +693,15 @@
               <label><input type="radio" name="score-mob" value="5" onchange="setScore(5)" checked><span class="score-opt">5 pts</span></label>
               <label><input type="radio" name="score-mob" value="11" onchange="setScore(11)"><span class="score-opt">11 pts</span></label>
             </div>
+            
+            <div class="config-toggle-row">
+              <span class="config-label">Exigir diferença de 2 pts (Tie-Break)</span>
+              <label class="switch">
+                <input type="checkbox" id="tie-break-toggle" checked onchange="toggleTieBreak(this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+
             <ul class="queue-list" id="q-list-mob"></ul>
             <button id="start-mob" class="btn primary full lg" style="display:none; margin-top:16px" onclick="startMatch()">▶ Iniciar Partida</button>
             <hr class="divider">
@@ -781,7 +855,7 @@
     <div style="display:flex; align-items:center; padding:8px 16px; background:var(--surface); border-bottom:2px solid var(--border); gap:12px; flex-shrink:0;">
       <div style="font-family:'Bebas Neue', sans-serif; font-size:24px; color:var(--primary); letter-spacing:2px;">🏓 ELT TT</div>
       <div id="tab-clock" style="font-family:'Bebas Neue', sans-serif; font-size:28px; color:var(--primary); letter-spacing:3px; flex:1; text-align:center;">00:00:00</div>
-      <button onclick="toggleTheme()" style="width:40px;height:40px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-size:16px;" id="tab-theme-btn">☀️</button>
+      <button onclick="rotateTheme()" style="width:40px;height:40px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-size:16px;" id="tab-theme-btn">☀️</button>
       <button onclick="toggleTablet()" style="padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface2);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">✕ Sair</button>
     </div>
 
@@ -924,6 +998,8 @@
       <button onclick="toggleFastScore()" style="padding:6px 14px; border-radius:20px; border:1.5px solid var(--red); background:var(--red-dim); color:var(--red); font-size:12px; font-weight:700; cursor:pointer;">✕ Sair</button>
     </div>
 
+    <div id="fast-mp-banner">⚡ MATCH POINT ⚡</div>
+
     <div style="flex:1; display:flex; min-height:0;">
       <div id="fast-area-left" class="fast-area" onclick="handleFastPoint('left')" style="background:var(--surface)">
         <div id="fast-lbl-left" class="fast-side-lbl">Lado Esquerdo</div>
@@ -965,20 +1041,20 @@
     let _tabletActive = false;
     let _tabletClockId = null;
     
-    // Novo Estado para o modo Placar Cru
+    // Estado para o modo Placar Cru
     let _fastActive = false;
     let fastState = {
       scoreLeft: 0,
       scoreRight: 0,
       limit: 5,
-      isSwapped: false, // Controla se o Lado A está na esquerda ou direita visual
-      history: [] // Pilha de desfazer simples
+      isSwapped: false, 
+      history: [] 
     };
 
     let state = {
       allPlayers: [], queue: [], match: null,
       ranking: {}, history: [], lastStates: [],
-      winScore: 5, sessionStart: Date.now(), themeMode: 'dark'
+      winScore: 5, requireTieBreak: true, sessionStart: Date.now(), themeMode: 'dark'
     };
     let matchTimerInterval = null;
 
@@ -1018,10 +1094,10 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       THEME SYSTEM (APENAS TROCA MANUAL)
+       THEME SYSTEM (SISTEMA DE ROTAÇÃO TRI-ESTADO)
     ═══════════════════════════════════════════════════════════ */
     function applyTheme(mode) {
-      document.body.classList.remove('theme-light', 'theme-dark');
+      document.body.classList.remove('theme-light', 'theme-dark', 'theme-high-contrast');
       const mainThemeIcon = document.getElementById('theme-icon');
       const mainThemeLabel = document.getElementById('theme-label');
       const tabThemeBtn = document.getElementById('tab-theme-btn');
@@ -1029,20 +1105,27 @@
       if (mode === 'light') {
         document.body.classList.add('theme-light');
         if(mainThemeIcon) mainThemeIcon.textContent = '🌙';
-        if(mainThemeLabel) mainThemeLabel.textContent = 'Modo Escuro';
+        if(mainThemeLabel) mainThemeLabel.textContent = 'Tema: Claro';
         if(tabThemeBtn) tabThemeBtn.textContent = '🌙';
+      } else if (mode === 'high-contrast') {
+        document.body.classList.add('theme-high-contrast');
+        if(mainThemeIcon) mainThemeIcon.textContent = '🕶️';
+        if(mainThemeLabel) mainThemeLabel.textContent = 'Tema: Contra a Luz';
+        if(tabThemeBtn) tabThemeBtn.textContent = '🕶️';
       } else {
         document.body.classList.add('theme-dark');
         if(mainThemeIcon) mainThemeIcon.textContent = '☀️';
-        if(mainThemeLabel) mainThemeLabel.textContent = 'Modo Claro';
+        if(mainThemeLabel) mainThemeLabel.textContent = 'Tema: Escuro';
         if(tabThemeBtn) tabThemeBtn.textContent = '☀️';
       }
       state.themeMode = mode;
       save();
     }
 
-    function toggleTheme() {
-      applyTheme(state.themeMode === 'dark' ? 'light' : 'dark');
+    function rotateTheme() {
+      if (state.themeMode === 'dark') applyTheme('light');
+      else if (state.themeMode === 'light') applyTheme('high-contrast');
+      else applyTheme('dark');
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -1065,7 +1148,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-       SCORE SELECTOR
+       SCORE SELECTOR & CONFIG
     ═══════════════════════════════════════════════════════════ */
     function setScore(n) {
       WINNING_SCORE = n;
@@ -1074,6 +1157,12 @@
       save(); 
       renderMatch();
       if (typeof _tabletActive !== 'undefined' && _tabletActive) _tabletRender();
+    }
+
+    function toggleTieBreak(isChecked) {
+      state.requireTieBreak = isChecked;
+      save();
+      renderMatch();
     }
 
     function syncScoreUI() {
@@ -1089,6 +1178,9 @@
       document.querySelectorAll(`input[name="tab-score"]`).forEach(r => {
         r.checked = (parseInt(r.value) === n);
       });
+
+      if (state.requireTieBreak === undefined) state.requireTieBreak = true;
+      document.getElementById('tie-break-toggle').checked = state.requireTieBreak;
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -1103,6 +1195,7 @@
         if (!state.allPlayers) state.allPlayers = [...state.queue];
         if (!state.sessionStart) state.sessionStart = Date.now();
         if (!state.lastStates) state.lastStates = [];
+        if (state.requireTieBreak === undefined) state.requireTieBreak = true;
         if (state.match && state.match.pausedAt) {
           const pausedDuration = Date.now() - state.match.pausedAt;
           state.match.startTime += pausedDuration;
@@ -1312,9 +1405,14 @@
     function isMatchPoint(match) {
       const { s1, s2 } = match;
       const t = WINNING_SCORE;
-      const inDeuce = s1 >= t - 1 && s2 >= t - 1;
-      if (inDeuce) return (Math.abs(s1 - s2) === 1);
-      return (s1 === t - 1 && s1 > s2) || (s2 === t - 1 && s2 > s1);
+      
+      if (state.requireTieBreak) {
+        const inDeuce = s1 >= t - 1 && s2 >= t - 1;
+        if (inDeuce) return (Math.abs(s1 - s2) === 1);
+        return (s1 === t - 1 && s1 > s2) || (s2 === t - 1 && s2 > s1);
+      } else {
+        return (s1 === t - 1 && s2 < t) || (s2 === t - 1 && s1 < t);
+      }
     }
 
     function startMatch() {
@@ -1393,7 +1491,18 @@
       const s2 = state.match.s2;
       const target = WINNING_SCORE;
 
-      if ((s1 >= target || s2 >= target) && Math.abs(s1 - s2) >= 2) {
+      let isOver = false;
+      if (state.requireTieBreak) {
+        if ((s1 >= target || s2 >= target) && Math.abs(s1 - s2) >= 2) {
+          isOver = true;
+        }
+      } else {
+        if (s1 >= target || s2 >= target) {
+          isOver = true;
+        }
+      }
+
+      if (isOver) {
         finishMatch();
       } else {
         save();
@@ -1564,7 +1673,7 @@
         state = {
           allPlayers: [], queue: [], match: null,
           ranking: {}, history: [], lastStates: [],
-          winScore: 5, sessionStart: Date.now(),
+          winScore: 5, requireTieBreak: true, sessionStart: Date.now(),
           themeMode: state.themeMode
         };
         stopMatchTimer();
@@ -1654,7 +1763,8 @@
        SISTEMA DO MODO PLACAR CRU / RÁPIDO
     ═══════════════════════════════════════════════════════════ */
     function toggleFastScore() {
-      _fastActive = !_fastActive;
+       e = !_fastActive;
+      _fastActive = e;
       document.getElementById('fast-overlay').style.display = _fastActive ? 'flex' : 'none';
       if (_fastActive) {
         resetFastScore();
@@ -1672,6 +1782,7 @@
           btn.className = "btn";
         }
       });
+      updateFastUI();
       checkFastMatchEnd();
     }
 
@@ -1686,7 +1797,6 @@
       if (document.getElementById('fast-winner-modal').style.display === 'block') return;
       if (navigator.vibrate) navigator.vibrate(30);
       
-      // Salva estado para o Desfazer
       fastState.history.push({ left: fastState.scoreLeft, right: fastState.scoreRight });
       if (fastState.history.length > 10) fastState.history.shift();
 
@@ -1713,7 +1823,6 @@
 
     function swapFastSides() {
       fastState.isSwapped = !fastState.isSwapped;
-      // Inverte os scores atuais para acompanhar a troca física
       let temp = fastState.scoreLeft;
       fastState.scoreLeft = fastState.scoreRight;
       fastState.scoreRight = temp;
@@ -1722,11 +1831,24 @@
       updateFastUI();
     }
 
+    function isFastMatchPoint() {
+      const l = fastState.scoreLeft;
+      const r = fastState.scoreRight;
+      const lim = fastState.limit;
+      
+      if (state.requireTieBreak) {
+        const inDeuce = l >= lim - 1 && r >= lim - 1;
+        if (inDeuce) return (Math.abs(l - r) === 1);
+        return (l === lim - 1 && l > r) || (r === lim - 1 && r > l);
+      } else {
+        return (l === lim - 1 && r < lim) || (r === lim - 1 && l < lim);
+      }
+    }
+
     function updateFastUI() {
       document.getElementById('fast-score-left').textContent = fastState.scoreLeft;
       document.getElementById('fast-score-right').textContent = fastState.scoreRight;
 
-      // Altera rótulo de acordo com o swap
       if (!fastState.isSwapped) {
         document.getElementById('fast-lbl-left').textContent = "Lado A";
         document.getElementById('fast-lbl-right').textContent = "Lado B";
@@ -1735,9 +1857,12 @@
         document.getElementById('fast-lbl-right').textContent = "Lado A";
       }
 
-      // Destaca quem está ganhando
       document.getElementById('fast-score-left').className = 'fast-num' + (fastState.scoreLeft > fastState.scoreRight ? ' leading' : '');
       document.getElementById('fast-score-right').className = 'fast-num' + (fastState.scoreRight > fastState.scoreLeft ? ' leading' : '');
+
+      const banner = document.getElementById('fast-mp-banner');
+      if (isFastMatchPoint()) banner.classList.add('show');
+      else banner.classList.remove('show');
     }
 
     function checkFastMatchEnd() {
@@ -1745,7 +1870,14 @@
       const r = fastState.scoreRight;
       const lim = fastState.limit;
 
-      if ((l >= lim || r >= lim) && Math.abs(l - r) >= 2) {
+      let isOver = false;
+      if (state.requireTieBreak) {
+        if ((l >= lim || r >= lim) && Math.abs(l - r) >= 2) isOver = true;
+      } else {
+        if (l >= lim || r >= lim) isOver = true;
+      }
+
+      if (isOver) {
         if (navigator.vibrate) navigator.vibrate([50, 80, 50, 80, 200]);
         playSound('victory');
 
@@ -1809,7 +1941,7 @@
             handleFastPoint('right');
           }
         }
-        return; // Bloqueia outros comandos para não afetar o fundo
+        return; 
       }
 
       // Atalhos clássicos do Torneio
