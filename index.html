@@ -300,6 +300,10 @@
       .score-num { font-size: 70px; }
     }
 
+    @media (max-width: 800px) {
+      .header-center { flex-wrap: wrap; gap: 4px; }
+    }
+
     @keyframes pointPop {
       0% { transform: scale(1); }
       40% { transform: scale(1.15); }
@@ -541,6 +545,21 @@
       color: var(--muted);
       margin-bottom: 1.5rem;
     }
+
+    /* ── PLACAR RAPIDO OVERLAY ──────────────────────────────── */
+    #fast-overlay {
+      display: none; position: fixed; inset: 0; z-index: 500; background: var(--bg); flex-direction: column; overflow: hidden;
+    }
+    .fast-area {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; user-select: none; position: relative; gap: 10px;
+    }
+    .fast-side-lbl {
+      font-family: 'DM Sans', sans-serif; font-size: clamp(20px, 4vw, 36px); font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 3px;
+    }
+    .fast-num {
+      font-family: 'Bebas Neue', sans-serif; font-size: clamp(140px, 22vw, 320px); line-height: 0.85; color: var(--primary); text-shadow: 2px 2px 15px rgba(0,0,0,0.6);
+    }
+    .fast-num.leading { color: #ffffff; text-shadow: 0 0 25px var(--primary); }
   </style>
 </head>
 <body>
@@ -553,6 +572,9 @@
       <button class="theme-toggle-btn" onclick="toggleTheme()" id="theme-btn">
         <span id="theme-icon">☀️</span>
         <span id="theme-label" class="btn-label">Modo Claro</span>
+      </button>
+      <button class="theme-toggle-btn" id="fast-btn" onclick="toggleFastScore()" style="border-color: var(--primary); color: var(--primary); background: var(--primary-dim)">
+        <span>⚡</span><span class="btn-label">Placar Rápido</span>
       </button>
       <button class="theme-toggle-btn" id="tablet-btn" onclick="toggleTablet()" style="border-color:var(--border)">
         <span>⬜</span><span class="btn-label">Modo Tablet</span>
@@ -890,6 +912,50 @@
     </div>
   </div>
 
+  <div id="fast-overlay">
+    <div style="display:flex; align-items:center; padding:10px 16px; background:var(--surface); border-bottom:2px solid var(--border); gap:12px; flex-shrink:0;">
+      <div style="font-family:'Bebas Neue', sans-serif; font-size:24px; color:var(--primary); letter-spacing:2px;">⚡ PLACAR RÁPIDO</div>
+      <div style="flex:1; display:flex; justify-content:center; gap:8px;">
+        <button class="btn" onclick="setFastScoreLimit(3)" id="fast-lim-3">3 pts</button>
+        <button class="btn primary" onclick="setFastScoreLimit(5)" id="fast-lim-5">5 pts</button>
+        <button class="btn" onclick="setFastScoreLimit(11)" id="fast-lim-11">11 pts</button>
+      </div>
+      <button onclick="resetFastScore()" style="padding:6px 14px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface2); color:var(--muted); font-size:12px; font-weight:700; cursor:pointer;">♻ Zerar</button>
+      <button onclick="toggleFastScore()" style="padding:6px 14px; border-radius:20px; border:1.5px solid var(--red); background:var(--red-dim); color:var(--red); font-size:12px; font-weight:700; cursor:pointer;">✕ Sair</button>
+    </div>
+
+    <div style="flex:1; display:flex; min-height:0;">
+      <div id="fast-area-left" class="fast-area" onclick="handleFastPoint('left')" style="background:var(--surface)">
+        <div id="fast-lbl-left" class="fast-side-lbl">Lado Esquerdo</div>
+        <div id="fast-score-left" class="fast-num">0</div>
+        <div style="font-size:11px; color:var(--muted); text-transform:uppercase; opacity:0.4;">Tecla [1] ou Vol +</div>
+      </div>
+
+      <div style="width:4px; background:var(--border); height:100%; flex-shrink:0;"></div>
+
+      <div id="fast-area-right" class="fast-area" onclick="handleFastPoint('right')" style="background:var(--surface2)">
+        <div id="fast-lbl-right" class="fast-side-lbl">Lado Direito</div>
+        <div id="fast-score-right" class="fast-num">0</div>
+        <div style="font-size:11px; color:var(--muted); text-transform:uppercase; opacity:0.4;">Tecla [2] ou Vol -</div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:center; gap:16px; padding:12px; background:var(--surface); border-top:1px solid var(--border); flex-shrink:0;">
+      <button class="btn lg" onclick="undoFastPoint()" style="min-width:140px;">↩ Desfazer</button>
+      <button class="btn lg" onclick="swapFastSides()" style="min-width:140px;">⇄ Inverter Lados</button>
+    </div>
+  </div>
+
+  <div class="winner-modal" id="fast-winner-modal" style="z-index:601;">
+    <div class="winner-trophy">🎉</div>
+    <div class="winner-name-display" id="fast-win-title">FIM DO SET</div>
+    <div style="font-size:18px; color:var(--text); margin-bottom:24px" id="fast-win-score">0 x 0</div>
+    <button class="btn primary full lg" onclick="closeFastWinner()">
+      Próximo Set ▶ &nbsp;
+      <span class="key-hint" style="background:rgba(0,0,0,0.15);border-color:rgba(0,0,0,0.2);color:var(--primary-text)">Enter</span>
+    </button>
+  </div>
+
   <script>
     /* ═══════════════════════════════════════════════════════════
        STATE & CONSTANTS
@@ -898,6 +964,17 @@
     const STORAGE_KEY = 'elt_tt_v1';
     let _tabletActive = false;
     let _tabletClockId = null;
+    
+    // Novo Estado para o modo Placar Cru
+    let _fastActive = false;
+    let fastState = {
+      scoreLeft: 0,
+      scoreRight: 0,
+      limit: 5,
+      isSwapped: false, // Controla se o Lado A está na esquerda ou direita visual
+      history: [] // Pilha de desfazer simples
+    };
+
     let state = {
       allPlayers: [], queue: [], match: null,
       ranking: {}, history: [], lastStates: [],
@@ -934,7 +1011,7 @@
         osc.frequency.setValueAtTime(659, now + 0.2);
         osc.frequency.setValueAtTime(880, now + 0.3);
         gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6); // <--- Corrigido aqui (removido o espaço)
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
         osc.start();
         osc.stop(now + 0.6);
       }
@@ -1574,6 +1651,127 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
+       SISTEMA DO MODO PLACAR CRU / RÁPIDO
+    ═══════════════════════════════════════════════════════════ */
+    function toggleFastScore() {
+      _fastActive = !_fastActive;
+      document.getElementById('fast-overlay').style.display = _fastActive ? 'flex' : 'none';
+      if (_fastActive) {
+        resetFastScore();
+        setFastScoreLimit(fastState.limit);
+      }
+    }
+
+    function setFastScoreLimit(n) {
+      fastState.limit = n;
+      [3, 5, 11].forEach(val => {
+        const btn = document.getElementById('fast-lim-' + val);
+        if (val === n) {
+          btn.className = "btn primary";
+        } else {
+          btn.className = "btn";
+        }
+      });
+      checkFastMatchEnd();
+    }
+
+    function resetFastScore() {
+      fastState.scoreLeft = 0;
+      fastState.scoreRight = 0;
+      fastState.history = [];
+      updateFastUI();
+    }
+
+    function handleFastPoint(side) {
+      if (document.getElementById('fast-winner-modal').style.display === 'block') return;
+      if (navigator.vibrate) navigator.vibrate(30);
+      
+      // Salva estado para o Desfazer
+      fastState.history.push({ left: fastState.scoreLeft, right: fastState.scoreRight });
+      if (fastState.history.length > 10) fastState.history.shift();
+
+      if (side === 'left') {
+        fastState.scoreLeft++;
+        animate('fast-score-left');
+      } else {
+        fastState.scoreRight++;
+        animate('fast-score-right');
+      }
+      playSound('point');
+      updateFastUI();
+      checkFastMatchEnd();
+    }
+
+    function undoFastPoint() {
+      if (fastState.history.length > 0) {
+        const last = fastState.history.pop();
+        fastState.scoreLeft = last.left;
+        fastState.scoreRight = last.right;
+        updateFastUI();
+      }
+    }
+
+    function swapFastSides() {
+      fastState.isSwapped = !fastState.isSwapped;
+      // Inverte os scores atuais para acompanhar a troca física
+      let temp = fastState.scoreLeft;
+      fastState.scoreLeft = fastState.scoreRight;
+      fastState.scoreRight = temp;
+      
+      if (navigator.vibrate) navigator.vibrate([40, 60, 40]);
+      updateFastUI();
+    }
+
+    function updateFastUI() {
+      document.getElementById('fast-score-left').textContent = fastState.scoreLeft;
+      document.getElementById('fast-score-right').textContent = fastState.scoreRight;
+
+      // Altera rótulo de acordo com o swap
+      if (!fastState.isSwapped) {
+        document.getElementById('fast-lbl-left').textContent = "Lado A";
+        document.getElementById('fast-lbl-right').textContent = "Lado B";
+      } else {
+        document.getElementById('fast-lbl-left').textContent = "Lado B";
+        document.getElementById('fast-lbl-right').textContent = "Lado A";
+      }
+
+      // Destaca quem está ganhando
+      document.getElementById('fast-score-left').className = 'fast-num' + (fastState.scoreLeft > fastState.scoreRight ? ' leading' : '');
+      document.getElementById('fast-score-right').className = 'fast-num' + (fastState.scoreRight > fastState.scoreLeft ? ' leading' : '');
+    }
+
+    function checkFastMatchEnd() {
+      const l = fastState.scoreLeft;
+      const r = fastState.scoreRight;
+      const lim = fastState.limit;
+
+      if ((l >= lim || r >= lim) && Math.abs(l - r) >= 2) {
+        if (navigator.vibrate) navigator.vibrate([50, 80, 50, 80, 200]);
+        playSound('victory');
+
+        let winnerLabel = "";
+        if (l > r) {
+          winnerLabel = !fastState.isSwapped ? "VÍTÓRIA DO LADO A" : "VÍTÓRIA DO LADO B";
+        } else {
+          winnerLabel = !fastState.isSwapped ? "VÍTÓRIA DO LADO B" : "VÍTÓRIA DO LADO A";
+        }
+
+        document.getElementById('fast-win-title').textContent = winnerLabel;
+        document.getElementById('fast-win-score').textContent = `${l} x ${r}`;
+        document.getElementById('fast-winner-modal').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+        launchConfetti();
+      }
+    }
+
+    function closeFastWinner() {
+      document.getElementById('fast-winner-modal').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+      stopConfetti();
+      resetFastScore();
+    }
+
+    /* ═══════════════════════════════════════════════════════════
        INIT SYSTEM CALL
     ═══════════════════════════════════════════════════════════ */
     init();
@@ -1594,6 +1792,27 @@
       const isActionP2 = isNum2 || isVolDown;
       const isAnyValidKey = isEnter || isActionP1 || isActionP2;
 
+      // Atalhos exclusivos para o NOVO MODO PLACAR RÁPIDO
+      if (_fastActive) {
+        const isFastWinnerOpen = document.getElementById('fast-winner-modal').style.display === 'block';
+        if (isFastWinnerOpen) {
+          if (isAnyValidKey) {
+            e.preventDefault();
+            closeFastWinner();
+          }
+        } else {
+          if (isActionP1) {
+            e.preventDefault();
+            handleFastPoint('left');
+          } else if (isActionP2) {
+            e.preventDefault();
+            handleFastPoint('right');
+          }
+        }
+        return; // Bloqueia outros comandos para não afetar o fundo
+      }
+
+      // Atalhos clássicos do Torneio
       const isWinnerOpen = document.getElementById('winner-modal').style.display === 'block';
       const isPauseOpen = document.getElementById('pause-modal').style.display === 'block';
 
@@ -1680,7 +1899,7 @@
     /* ═══════════════════════════════════════════════════════════
        PING PONG TRIVIA
     ═══════════════════════════════════════════════════════════ */
-    const TRIVIA = ['O ping pong foi inventado na Inglaterra no final do século XIX como entertainment de salão.', 'A bola de ping pong viaja a até 112 km/h em um saque profissional.', 'O tênis de mesa é o esporte com mais praticantes no mundo, cerca de 300 milhões.', 'Em 1971, o ping pong ajudou na diplomacia entre EUA e China.', 'A bola oficial tem 40mm e pesa 2,7 gramas.', 'Ma Long é o único a conquistar todos os títulos mundiais e olímpicos simultaneamente.', 'O tênis de mesa virou esporte olímpico em 1988.', 'O recorde de troca de bolas sem parar dura mais de 8 horas.', 'O saque precisa subir pelo menos 16cm após ser lançado para ser válido.', 'A raquete deve ter obrigatoriamente um lado preto e outro vermelho.', 'Originalmente, as raquetes eram feitas de rolhas de vinho ou caixas de charuto.', 'O ponto mais longo da história durou 2 horas e 12 minutos em uma única troca.'];
+    const TRIVIA = ['O ping pong foi inventado na Inglaterra no final do século XIX como entertainment de salão.', 'A bola de ping pong viaja a até 112 km/h em um saque profissional.', 'O tênis de mesa é o esporte com mais praticantes no mundo, cerca de 300 milhões.', 'Em 1971, o ping pong ajudou na diplomacia entre EUA e China.', 'A bola oficial tem 40mm e pesa 2,7 gramas.', 'Ma Long é o único a conquistar todos os títulos mundiais e olímpicos simultaneamente.', 'O tênis de mesa virou esporte olímpico em 1988.', 'O recorde de troca de bolas sem parar dura mais de 8 horas.', 'O saque precisa subir pelo menos 16cm após ser lançado para ser válido.', 'A raquete deve ter obrigatoriamente um lado preto e outro vermelho.', 'Originalmente, as raquetes eram feitas de rolhas de vinho ou caixas de charuto.', 'O ponto mais longo da história durou 2 horas e 12 minutes em uma única troca.'];
     let triviaIdx = Math.floor(Math.random() * TRIVIA.length);
 
     function showTrivia() {
