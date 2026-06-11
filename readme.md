@@ -1,62 +1,59 @@
-# 🏓 ELT TT Tournament (Eletropong)
+# 🏓 ELT TT Tournament
 
-Um sistema completo, leve e responsivo para gerenciamento e marcação de pontos em torneios de tênis de mesa (Ping Pong). Desenvolvido com foco em usabilidade mobile, modo tablet e controle rápido de sets, ideal para telas de LED ou dispositivos operados na beira da mesa.
-
----
-
-## ✨ Funcionalidades Principais
-
-* **👥 Gerenciamento de Fila Dinâmico:** Adicione e remova jogadores facilmente. O app gerencia automaticamente quem está jogando e quem é o próximo da vez.
-* **▶️ Painel de Partida Completo:** Visualização clara da pontuação atual, histórico de pontos do set (bolinhas de progresso), indicador de saque automático e alertas de *Match Point*.
-* **🏆 Ranking Automatizado:** Tabela de classificação baseada em aproveitamento (Vitórias/Derrotas) com opção de exportar o relatório do dia em formato `.txt`.
-* **📜 Histórico de Sets:** Registro completo de todas as partidas finalizadas, incluindo placar, duração do set e horário.
-* **⬜ Modo Tablet:** Interface dedicada para telas maiores montadas em suportes na mesa, otimizando o espaço para visualização dos atletas.
+O **Eletropong Table Tennis Tournament** é um ecossistema completo de gerenciamento, telemetria e análise para torneios corporativos de tênis de mesa. Desenvolvido em arquitetura vanilla de alta performance, o sistema opera de forma 100% autônoma (Client-Side), oferecendo persistência robusta, cálculos estatísticos avançados e suporte nativo a Progressive Web App (PWA).
 
 ---
 
-## ⚡ Novas Implementações Importantes
+## 🚀 Novas Funcionalidades & Engenharia do Sistema
 
-### 1. 🕶️ Modo Contra a Luz (Filtro de Alto Contraste)
-Pensado para jogos em ambientes externos ou sob refletores intensos onde o reflexo da tela dificulta a leitura. O botão de tema agora alterna ciclicamente entre três estados:
-* **Modo Escuro:** Visual moderno com fundo escuro.
-* **Modo Claro:** Interface limpa com tons pastéis.
-* **Modo Contra a Luz:** Força contraste absoluto (Fundo `#ffffff` puro e textos/números em `#000000` absoluto), garantindo leitura cristalina mesmo sob a luz direta do sol. *Disponível em todas as telas, incluindo o Placar Rápido e Modo Tablet.*
+A versão corrente introduz recursos críticos de nível corporativo para automação de quadra:
 
-### 2. ⚙️ Chave de Vantagem (Tie-Break Opcional)
-Agora o organizador pode escolher como a partida termina através do toggle **"Exigir diferença de 2 pts (Tie-Break)"**:
-* **Ativado (Padrão):** Segue a regra oficial. Se o jogo empatar no limite (ex: 4x4 ou 10x10), a partida continua até que um jogador abra 2 pontos de vantagem.
-* **Desativado:** Modo "Sudden Death". Quem alcançar a pontuação máxima escolhida (3, 5 ou 11) primeiro ganha o set imediatamente (ex: 5x4 encerra o jogo).
+### 🎮 Controle de Arena Inteligente & Atalhos Rápidos
+* **Teclas `1` e `2` Dinâmicas**: Computam pontos para o jogador da esquerda ou direita instantaneamente. Caso o modal de vitória esteja aberto, pressionar `1` ou `2` fecha a janela, salva os dados, rotaciona a mesa chamando o próximo desafiante e já computa o ponto inicial da nova partida.
+* **Tecla `Enter`**: Fecha modais de anúncio e libera a mesa sem interferir no placar.
+* **Inversão e Desfazimento**: Suporte completo a Rollback de pontuação (Undo em até 15 níveis) e inversão tática de lados de mesa.
 
-### 3. ⚡ Placar Rápido Totalmente Integrado
-O modo de marcação cru (sem necessidade de registro de nomes) foi atualizado para uma experiência de primeira classe:
-* Herda instantaneamente o tema global ativo (como o modo Contra a Luz).
-* Respeita a configuração ativa de Tie-Break.
-* Inclui um banner dinâmico de *Match Point* para aumentar a emoção na hora decisiva.
+### 📊 Algoritmo de Classificação ELO (Métricas ITTF/FIDE)
+* O sistema abandonou contadores simples de vitória e adotou uma **Engine de ELO Matemático** baseada na probabilidade laplaciana (Fator K=32). O cálculo mede o peso técnico de cada confronto baseado no histórico de força de ambos os atletas.
 
----
+### 🏆 Árvore Binária de Chaves Eliminatórias (Mata-Mata)
+* Gerador automatizado de brackets baseado em potências matemáticas de base dois ($2^n$).
+* Distribuição de seeds por embaralhamento aleatório (Shuffle).
+* Avanço automatizado de fase com tratamento nativo para jogadores ímpares através de subida por **BYE W.O.**.
 
-## 🛠️ Atalhos de Teclado & Controle Remoto
+### 👤 Painel do Atleta com Telemetria Visual
+* **Gráficos de Tendência Nativos**: Gráficos de linha gerados dinamicamente em formato SVG puro para ilustrar a consistência técnica recente (últimos 8 confrontos).
+* **Armário de Conquistas**: Gamificação profunda que rastreia métricas de desempenho em tempo real para desbloqueio de medalhas como *"Batismo de Fogo"*, *"Lenda da Arena (ELO >= 1600)"*, e o raro *"Pneu Furado Absoluto (Set vencido de 0)"*.
 
-O app é compatível com mini-teclados sem fio e controles bluetooth (passadores de slide/remotos de selfie adaptados):
-
-* **Tecla `1` ou Volume `+`:** Ponto para o Jogador 1 / Lado Esquerdo.
-* **Tecla `2` ou Volume `-`:** Ponto para o Jogador 2 / Lado Direito.
-* **Tecla `Enter`:** Fecha a tela de vitória e inicia a próxima partida da fila.
+### ⚡ Sub-Módulos e Telemetria de Rodapé
+* **Placar de Treinamento Avulso**: Interface paralela isolada para partidas rápidas de aquecimento sem afetar o ranking global.
+* **Estatísticas Globais**: Exibição em tempo real da média agregada de pontos por set, recordistas em sequência de vitórias (Streak) e identificação do set mais prolongado da história do servidor (Deuce Extremo).
 
 ---
 
-## 🚀 Como Executar
+## 🛠️ Tecnologias Utilizadas
 
-Por ser um sistema construído puramente em **HTML5, CSS3 e JavaScript**, ele não precisa de compilação ou servidores complexos:
-
-1. Baixe o arquivo `index.html`.
-2. Dê um duplo clique no arquivo para abrir em qualquer navegador moderno (Chrome, Safari, Edge, Firefox).
-3. Para salvar os dados localmente, o app utiliza o `localStorage` do navegador. Os jogadores e o ranking não somem ao atualizar a página.
+* **Estrutura e Interface**: HTML5 Semântico, CSS3 Premium com arquitetura de variáveis para múltiplos temas visuais (Escuro, Claro, Cyberpunk e Alto Contraste).
+* **Motor Lógico**: JavaScript Moderno (ES6+) estruturado em modelo de orientação a objetos isolados por responsabilidade.
+* **Subsistema de Áudio**: *Web Audio API* nativa para síntese de ondas de frequência senoidais e dente-de-serra (impactos de raquete, efeitos arpejados de vitória e o áudio *Easter Egg* do placar 4x4).
+* **Persistência**: Cache síncrono local via *LocalStorage Engine* com rotinas automatizadas de sanitização recursiva anti-corrupção de dados.
 
 ---
 
-## 💾 Tecnologias Utilizadas
+## ⌨️ Mapa de Operação Rápida por Teclado
 
-* **Linguagens:** HTML5, CSS3 (CSS Variables para os Temas), JavaScript (ES6+).
-* **Fontes:** Google Fonts (*Bebas Neue* e *DM Sans*).
-* **Áudio:** Web Audio API (Sintetizador nativo para efeitos sonoros de pontos e vitória sem arquivos externos).
+| Tecla | Estado Regular | Com Modal de Vitória Aberto |
+| :--- | :--- | :--- |
+| <kbd>1</kbd> | Ponto para o Atleta da **Esquerda** | Fecha o modal, inicia nova partida e dá **+1 ponto para a Esquerda** |
+| <kbd>2</kbd> | Ponto para o Atleta da **Direita** | Fecha o modal, inicia nova partida e dá **+1 ponto para a Direita** |
+| <kbd>Enter</kbd> | *Nenhum* | Fecha o modal e inicia nova partida (Mesa Zerada) |
+
+---
+
+## 📦 Instalação e Distribuição Offline
+
+Como o ecossistema é baseado em engenharia puramente Client-Side e configurado como PWA, não há necessidade de configuração de servidores Web robustos ou bancos de dados relacionais:
+
+1. Clone ou copie o repositório para o diretório local.
+2. Certifique-se de manter os arquivos `index.html`, `manifest.json` e o script do *Service Worker* no mesmo nível de diretório.
+3. Para suporte completo a instalação offline em dispositivos móveis e desktops, hospede os arquivos sob um protocolo seguro (`https://`) ou execute localmente via ambiente seguro localhost.
