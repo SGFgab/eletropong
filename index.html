@@ -2392,8 +2392,10 @@
 
         if ((fs1 >= fLimit || fs2 >= fLimit) && Math.abs(fs1 - fs2) >= 2) {
           AudioEcosystemEngine.playTone('victory');
-          alert(`Treino Concluído! Vitória do Lado ${sideIndex === 0 ? 'A':'B'} por ${fs1} a ${fs2}.`);
-          this.resetFastCounters();
+          setTimeout(() => {
+            alert(`Treino Concluído! Vitória do Lado ${sideIndex === 0 ? 'A':'B'} por ${fs1} a ${fs2}.`);
+            this.resetFastCounters();
+          }, 80);
         }
       }
 
@@ -2544,9 +2546,9 @@
           if (eventKey.key === '1') {
             eventKey.preventDefault();
             if (winnerModalOpen) {
-              // Caso o modal esteja visível, a tecla '1' fecha a janela, rotaciona os lados e adiciona +1 ponto ao Player 1
               this.closeWinnerModal();
-              setTimeout(() => this.app.match.scorePoint(0), 10);
+            } else if (this.app.fastMatchState.active) {
+              this.app.match.scoreFastMatch(0);
             } else {
               this.app.match.scorePoint(0);
             }
@@ -2554,9 +2556,9 @@
           if (eventKey.key === '2') {
             eventKey.preventDefault();
             if (winnerModalOpen) {
-              // Caso o modal esteja visível, a tecla '2' fecha a janela, rotaciona os lados e adiciona +1 ponto ao Player 2
               this.closeWinnerModal();
-              setTimeout(() => this.app.match.scorePoint(1), 10);
+            } else if (this.app.fastMatchState.active) {
+              this.app.match.scoreFastMatch(1);
             } else {
               this.app.match.scorePoint(1);
             }
