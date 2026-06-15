@@ -144,6 +144,117 @@
       --shadow-light: transparent;
     }
 
+    /* ── VARIÁVEIS DE AMBIENTE: TEMA MATRIX DIGITAL ── */
+    body.theme-matrix {
+      --bg: #000000;
+      --surface: #040d04;
+      --surface2: #081a08;
+      --surface3: #0d2a0d;
+      --surface-overlay: rgba(4, 13, 4, 0.97);
+      --border: #00ff41;
+      --border-light: #004410;
+      --border-focus: #00ff41;
+      --primary: #00ff41;
+      --primary-hover: #00cc33;
+      --primary-glow: rgba(0, 255, 65, 0.5);
+      --primary-glow-weak: rgba(0, 255, 65, 0.15);
+      --primary-dim: #010801;
+      --primary-text: #000000;
+      --secondary: #008f11;
+      --secondary-hover: #007a0e;
+      --secondary-glow: rgba(0, 143, 17, 0.4);
+      --secondary-dim: #000500;
+      --secondary-text: #ffffff;
+      --success: #00ff41;
+      --success-glow: rgba(0, 255, 65, 0.4);
+      --success-dim: #010801;
+      --red: #ff0000;
+      --red-hover: #cc0000;
+      --red-glow: rgba(255, 0, 0, 0.4);
+      --red-dim: #0a0000;
+      --text: #00ff41;
+      --text-soft: #00b32d;
+      --text-muted: #00661a;
+      --muted: #004410;
+      --shadow-heavy: rgba(0, 255, 65, 0.2);
+      --shadow-medium: rgba(0, 255, 65, 0.1);
+      --shadow-light: transparent;
+    }
+
+    /* ── VARIÁVEIS DE AMBIENTE: TEMA RETRO SYNTHWAVE ── */
+    body.theme-synthwave {
+      --bg: #1a0b2e;
+      --surface: #241242;
+      --surface2: #2f1757;
+      --surface3: #412078;
+      --surface-overlay: rgba(36, 18, 66, 0.96);
+      --border: #ff007f;
+      --border-light: #7a003d;
+      --border-focus: #00f0ff;
+      --primary: #ff007f;
+      --primary-hover: #d6006c;
+      --primary-glow: rgba(255, 0, 127, 0.6);
+      --primary-glow-weak: rgba(255, 0, 127, 0.2);
+      --primary-dim: #1c000e;
+      --primary-text: #ffffff;
+      --secondary: #00f0ff;
+      --secondary-hover: #00c2cf;
+      --secondary-glow: rgba(0, 240, 255, 0.5);
+      --secondary-dim: #001f21;
+      --secondary-text: #000000;
+      --success: #24e524;
+      --success-glow: rgba(36, 229, 36, 0.4);
+      --success-dim: #041f04;
+      --red: #ff007f;
+      --red-hover: #d6006c;
+      --red-glow: rgba(255, 0, 127, 0.6);
+      --red-dim: #1c000e;
+      --text: #ffffff;
+      --text-soft: #ff007f;
+      --text-muted: #b800ff;
+      --muted: #5e0085;
+      --shadow-heavy: rgba(255, 0, 127, 0.35);
+      --shadow-medium: rgba(0, 240, 255, 0.2);
+      --shadow-light: transparent;
+    }
+
+    /* ── VARIÁVEIS DE AMBIENTE: TEMA ICE BLIZZARD ── */
+    body.theme-ice {
+      --bg: #0b132b;
+      --surface: #1c2541;
+      --surface2: #2a3457;
+      --surface3: #3b4873;
+      --surface-overlay: rgba(28, 37, 65, 0.96);
+      --border: #6fffe9;
+      --border-light: #2c3e50;
+      --border-focus: #5bc0be;
+      --primary: #6fffe9;
+      --primary-hover: #52e0cc;
+      --primary-glow: rgba(111, 255, 233, 0.5);
+      --primary-glow-weak: rgba(111, 255, 233, 0.15);
+      --primary-dim: #0a1f24;
+      --primary-text: #0b132b;
+      --secondary: #5bc0be;
+      --secondary-hover: #4aa1a0;
+      --secondary-glow: rgba(91, 192, 190, 0.4);
+      --secondary-dim: #0e1924;
+      --secondary-text: #ffffff;
+      --success: #3be8b0;
+      --success-glow: rgba(59, 232, 176, 0.4);
+      --success-dim: #071f18;
+      --red: #ff5252;
+      --red-hover: #e04343;
+      --red-glow: rgba(255, 82, 82, 0.3);
+      --red-dim: #210d0d;
+      --text: #ffffff;
+      --text-soft: #6fffe9;
+      --text-muted: #5a759e;
+      --muted: #3a4f6e;
+      --shadow-heavy: rgba(0, 0, 0, 0.6);
+      --shadow-medium: rgba(111, 255, 233, 0.1);
+      --shadow-light: rgba(0, 0, 0, 0.1);
+    }
+
     /* ── VARIÁVEIS DE AMBIENTE: TEMA ALTO CONTRASTE ABSOLUTO ── */
     body.theme-high-contrast {
       --bg: #ffffff;
@@ -1233,7 +1344,7 @@
       margin: 1.5rem 0;
     }
 
-    /* ── SEÇÃO DOS PLACARES RAPIDOS (TREINAMENTO) ── */
+    /* ── SEÇÃO DO MODO PLACAR (TREINAMENTO AVULSO REESTILIZADO) ── */
     #fast-overlay {
       display: none;
       position: fixed;
@@ -1259,7 +1370,7 @@
 
     .fast-side-lbl {
       font-family: var(--font-main);
-      font-size: clamp(18px, 3.5vw, 32px);
+      font-size: clamp(20px, 4vw, 36px);
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
@@ -1267,14 +1378,14 @@
     }
     .fast-num {
       font-family: var(--font-display);
-      font-size: clamp(120px, 24vw, 340px);
-      line-height: 0.8;
+      font-size: clamp(180px, 35vw, 550px); /* Fonte massivamente ampliada */
+      line-height: 0.75;
       color: var(--primary);
-      text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      text-shadow: 0 10px 40px rgba(0,0,0,0.85);
     }
     .fast-num.leading {
       color: #ffffff;
-      text-shadow: 0 0 40px var(--primary);
+      text-shadow: 0 0 50px var(--primary);
     }
 
     /* ── MODAIS DE BANCOS DE DADOS DE FINAIS DE SETS ── */
@@ -1463,7 +1574,7 @@
         <span id="theme-label-indicator" class="btn-label">Tema: Escuro</span>
       </button>
       <button class="control-btn" onclick="app.match.toggleFastScore()" style="border-color: var(--primary); color: var(--primary);">
-        <span>⚡</span><span class="btn-label">Placar de Treinamento Avulso</span>
+        <span>⚡</span><span class="btn-label">Modo Placar</span>
       </button>
     </div>
     <div class="header-right-clock">
@@ -1719,33 +1830,34 @@
 
   <div id="fast-overlay">
     <div style="display: flex; align-items: center; padding: 14px 28px; background-color: var(--surface); border-bottom: 2px solid var(--border); gap: 20px;">
-      <div style="font-family: var(--font-display); font-size: 28px; color: var(--primary); letter-spacing: 2px; line-height: 1;">⚡ PLACAR DE TREINO</div>
+      <div style="font-family: var(--font-display); font-size: 28px; color: var(--primary); letter-spacing: 2px; line-height: 1;">⚡ MODO PLACAR</div>
       <div style="flex: 1; display: flex; justify-content: center; gap: 12px;">
         <button class="control-btn" onclick="app.match.changeFastLimit(3)" id="fast-btn-lim-3">Set Rápido (3 pts)</button>
         <button class="control-btn" onclick="app.match.changeFastLimit(5)" id="fast-btn-lim-5">Set Médio (5 pts)</button>
         <button class="control-btn" onclick="app.match.changeFastLimit(11)" id="fast-btn-lim-11">Set Longo (11 pts)</button>
       </div>
-      <button class="action-btn btn-danger" onclick="app.match.toggleFastScore()">✕ Fechar Modo Treino</button>
+      <button class="action-btn btn-danger" onclick="app.match.toggleFastScore()">✕ Fechar Modo Placar</button>
     </div>
     
-    <div id="fast-mp-banner">⚡ MATCH POINT DO TREINO ⚡</div>
+    <div id="fast-mp-banner">⚡ MATCH POINT ⚡</div>
     
     <div style="flex: 1; display: flex;">
       <div class="fast-area" onclick="app.match.scoreFastMatch(0)" style="background-color: var(--surface);">
-        <div class="fast-side-lbl" id="fast-title-side-0">LADO A</div>
+        <div class="fast-side-lbl" id="fast-title-side-0">LADO 1</div>
         <div class="fast-num" id="fast-score-display-0">0</div>
       </div>
       
       <div style="width: 3px; background-color: var(--border); height: 100%;"></div>
       
       <div class="fast-area" onclick="app.match.scoreFastMatch(1)" style="background-color: var(--surface2);">
-        <div class="fast-side-lbl" id="fast-title-side-1">LADO B</div>
+        <div class="fast-side-lbl" id="fast-title-side-1">LADO 2</div>
         <div class="fast-num" id="fast-score-display-1">0</div>
       </div>
     </div>
   </div>
 
   <script>
+
     /**
      * ── GERENCIADOR CENTRAL DE ESTADO E PERSISTÊNCIA ROBUSTA (LOCALSTORAGE)
      * CONTROLADORA GLOBAL DA APLICAÇÃO EM NÍVEL CORPORATIVO
@@ -2330,6 +2442,7 @@
         this.app.state.match = null;
         this.app.saveEcosystemData();
         
+        this.app.isFastMatchActive = false; // Fluxo de mesa regular habilitado
         this.app.ui.triggerWinnerAnnouncementModal(winnerName, `Resultado Final: ${historyRecord.score} · Duração: ${dynamicDurationString}`, `Classificação ELO Atualizada: ${winnerProfile.elo} (${eloCalculations.winnerDelta > 0 ? '+'+eloCalculations.winnerDelta : eloCalculations.winnerDelta})`);
         AudioEcosystemEngine.playTone('victory');
       }
@@ -2392,10 +2505,13 @@
 
         if ((fs1 >= fLimit || fs2 >= fLimit) && Math.abs(fs1 - fs2) >= 2) {
           AudioEcosystemEngine.playTone('victory');
-          setTimeout(() => {
-            alert(`Treino Concluído! Vitória do Lado ${sideIndex === 0 ? 'A':'B'} por ${fs1} a ${fs2}.`);
-            this.resetFastCounters();
-          }, 80);
+          this.app.isFastMatchActive = true; // Define flag para isolar o fechamento do modal secundário
+          
+          this.app.ui.triggerWinnerAnnouncementModal(
+            `LADO ${sideIndex === 0 ? '1':'2'}`, 
+            `Placar do Confronto: ${fs1} x ${fs2}`, 
+            `Fim do Set Autônomo`
+          );
         }
       }
 
@@ -2615,7 +2731,7 @@
       }
 
       rotateTheme() {
-        const structuralThemes = ['dark', 'light', 'cyberpunk', 'high-contrast'];
+        const structuralThemes = ['dark', 'light', 'cyberpunk', 'matrix', 'synthwave', 'ice', 'high-contrast'];
         let currentIndex = structuralThemes.indexOf(this.app.state.theme);
         this.app.state.theme = structuralThemes[(currentIndex + 1) % structuralThemes.length];
 
@@ -2890,7 +3006,7 @@
               </div>
             </div>
             <div>
-              <h3 style="font-family:var(--font-display); font-size:18px; color:var(--text-soft); letter-spacing:1px;">Gráfico de Forma (Evolução Técnica de Sets)</h3>
+              <h3 style="font-family:var(--font-display); font-size:18px; color:var(--text-soft); letter-spacing:1px;">Gráfico de Forma (Evolução Técnico de Sets)</h3>
               ${recentFormArray.length > 0 ? inlineSvgLineChartHtml : '<p style="padding:20px; font-size:13px; color:var(--text-muted)">Nenhum set finalizado para alimentar o gráfico de tendência.</p>'}
               <h3 style="font-family:var(--font-display); font-size:18px; color:var(--text-soft); letter-spacing:1px; margin-top:2rem;">Armário de Conquistas e Medalhas de Honra</h3>
               <div class="badges-flex-grid">${badgesLayoutGridHtml}</div>
@@ -2997,7 +3113,14 @@
         document.getElementById('global-overlay-mask').style.display = 'none';
         this.haltCanvasConfettiEngine();
         
-        // REESCRITA DO ROTACIONAMENTO: Puxa o próximo da fila mantendo o rei da mesa
+        // INTERCEPTADOR DE FLUXO: Se a vitória veio do Modo Placar, limpa as parciais e encerra sem mexer na fila real
+        if (this.app.isFastMatchActive) {
+          this.app.isFastMatchActive = false;
+          this.app.match.resetFastCounters();
+          return;
+        }
+
+        // REESCRITA DO ROTACIONAMENTO STANDARD DA ARENA ORIGINAL
         if (this.app.lastWinnerReused && this.app.state.queue.length >= 1 && !this.app.tournamentState.active) {
           const nextChallenger = this.app.state.queue.shift();
           
@@ -3135,6 +3258,7 @@
         this.tournament = new TournamentBracketEngine(this);
         this.ui = new VisualInterfaceManager(this);
         this.lastWinnerReused = null;
+        this.isFastMatchActive = false; // Flag de isolamento estrutural do Modo Placar simples
       }
 
       /**
