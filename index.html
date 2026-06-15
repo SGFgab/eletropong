@@ -1573,9 +1573,13 @@
         <span id="theme-icon-indicator">☀️</span>
         <span id="theme-label-indicator" class="btn-label">Tema: Escuro</span>
       </button>
+      <button class="control-btn" id="theme-loop-btn" onclick="app.ui.toggleThemeLoop()">
+        <span>🔄</span><span class="btn-label" id="theme-loop-label">Loop: Desligado</span>
+      </button>
       <button class="control-btn" onclick="app.match.toggleFastScore()" style="border-color: var(--primary); color: var(--primary);">
         <span>⚡</span><span class="btn-label">Modo Placar</span>
       </button>
+    </div>
     </div>
     <div class="header-right-clock">
       <div id="clock">00:00:00</div>
@@ -2650,6 +2654,7 @@
         this.confettiFrameId = null;
         this.confettiRunning = false;
         this.confettiParticlesList = [];
+        this.themeLoopIntervalId = null; // Nova variável para controlar o temporizador do loop
       }
 
       setupInterfaceListeners() {
@@ -2730,7 +2735,7 @@
         document.getElementById('session-timer-display').innerHTML = `Tempo de Sessão: <b style="color:var(--primary); font-family:var(--font-mono);">${outputStr}</b>`;
       }
 
-      rotateTheme() {
+     rotateTheme() {
         const structuralThemes = ['dark', 'light', 'cyberpunk', 'matrix', 'synthwave', 'ice', 'high-contrast'];
         let currentIndex = structuralThemes.indexOf(this.app.state.theme);
         this.app.state.theme = structuralThemes[(currentIndex + 1) % structuralThemes.length];
@@ -2742,6 +2747,29 @@
         document.getElementById('theme-label-indicator').textContent = `Tema: ${this.app.state.theme.toUpperCase()}`;
         this.app.saveEcosystemData();
       }
+
+      /* FUNÇÃO NOVA 1: LIGA / DESLIGA O LOOP AUTOMÁTICO */
+      toggleThemeLoop() {
+        const btn = document.getElementById('theme-loop-btn');
+        const label = document.getElementById('theme-loop-label');
+
+        if (this.themeLoopIntervalId) {
+          // Se o loop já existe, desliga ele
+          clearInterval(this.themeLoopIntervalId);
+          this.themeLoopIntervalId = null;
+          btn.classList.remove('active-mode');
+          label.textContent = "Loop: Desligado";
+        } else {
+          // Se está desligado, liga rodando a cada 8 segundos (8000 milissegundos)
+          btn.classList.add('active-mode');
+          label.textContent = "Loop: ATIVO";
+          
+          this.themeLoopIntervalId = setInterval(() => {
+            this.rotateTheme();
+          }, 8000); 
+        }
+      }
+        
 
       updateEcosystemInterface() {
         this.renderQueueLists();
