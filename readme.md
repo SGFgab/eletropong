@@ -57,3 +57,8 @@ Como o ecossistema é baseado em engenharia puramente Client-Side e configurado 
 1. Clone ou copie o repositório para o diretório local.
 2. Certifique-se de manter os arquivos `index.html`, `manifest.json` e o script do *Service Worker* no mesmo nível de diretório.
 3. Para suporte completo a instalação offline em dispositivos móveis e desktops, hospede os arquivos sob um protocolo seguro (`https://`) ou execute localmente via ambiente seguro localhost.
+
+## ⚡ Novidades da Versão 2026.4
+- **Modo Placar:** Interface de treino avulso simplificada, sem textos desnecessários e com fontes massivamente ampliadas para alta visibilidade.
+- **Novos Temas Visuais Premium:** Rotação nativa expandida com os temas Matrix Digital, Retro Synthwave e Ice Blizzard.
+- **Fluxo Pós-Jogo Isolado:** O Modo Placar agora utiliza a tela oficial de vitória com chuva de confetes, resetando os contadores ao fechar sem interferir na fila de espera ou nas métricas de ELO locais.

@@ -1,24 +1,20 @@
 {
-  "name": "ELT TT Tournament",
+  "name": "ELT TT Pro Tournament",
   "short_name": "Eletropong",
-  "description": "Placar e gerenciador de torneios de tênis de mesa.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0e0e0e",
+  "background_color": "#060608",
   "theme_color": "#ff9800",
-  "orientation": "any",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3222/3222662.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3222/3222662.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     }
   ]
 }
