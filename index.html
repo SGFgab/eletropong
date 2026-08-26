@@ -2991,12 +2991,16 @@
         };
 
         const rgb = hexToRgb(hexCode);
-        const root = document.documentElement;
-        root.style.setProperty('--primary', hexCode);
-        root.style.setProperty('--border-focus', hexCode);
-        root.style.setProperty('--primary-glow', `rgba(${rgb}, 0.4)`);
-        root.style.setProperty('--primary-glow-weak', `rgba(${rgb}, 0.15)`);
-        root.style.setProperty('--primary-dim', `rgba(${rgb}, 0.12)`);
+
+        // Aplica as variáveis CSS diretamente no <html> (:root) e no <body> para sobrescrever body.theme-X
+        [document.documentElement, document.body].forEach(target => {
+          if (!target) return;
+          target.style.setProperty('--primary', hexCode);
+          target.style.setProperty('--border-focus', hexCode);
+          target.style.setProperty('--primary-glow', `rgba(${rgb}, 0.4)`);
+          target.style.setProperty('--primary-glow-weak', `rgba(${rgb}, 0.15)`);
+          target.style.setProperty('--primary-dim', `rgba(${rgb}, 0.12)`);
+        });
 
         const metaTheme = document.getElementById('meta-theme-color');
         if (metaTheme) metaTheme.setAttribute('content', hexCode);
@@ -3023,6 +3027,11 @@
         document.body.className = '';
         if (themeName !== 'dark') {
           document.body.classList.add(`theme-${themeName}`);
+        }
+
+        // Re-aplica a cor de destaque personalizada por cima da classe do tema recém-aplicado
+        if (this.app.state.accentColor) {
+          this.applyAccentColor(this.app.state.accentColor, false);
         }
 
         const themeCards = document.querySelectorAll('.theme-option-card');
