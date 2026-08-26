@@ -6,7 +6,7 @@
   <title>🏓 ELT TT Tournament</title>
   
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#ff9800">
+  <meta name="theme-color" content="#007fff" id="meta-theme-color">
   
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   
@@ -26,13 +26,13 @@
       --surface-overlay: rgba(17, 17, 21, 0.95);
       --border: #262636;
       --border-light: #1c1c28;
-      --border-focus: #ff9800;
-      --primary: #ff9800;
-      --primary-hover: #e68900;
-      --primary-glow: rgba(255, 152, 0, 0.4);
-      --primary-glow-weak: rgba(255, 152, 0, 0.15);
-      --primary-dim: #2b1c0c;
-      --primary-text: #000000;
+      --border-focus: #007fff;
+      --primary: #007fff;
+      --primary-hover: #0066cc;
+      --primary-glow: rgba(0, 127, 255, 0.4);
+      --primary-glow-weak: rgba(0, 127, 255, 0.15);
+      --primary-dim: #001f3f;
+      --primary-text: #ffffff;
       --secondary: #5c5cf2;
       --secondary-hover: #4747d1;
       --secondary-glow: rgba(92, 92, 242, 0.35);
@@ -79,12 +79,12 @@
       --surface-overlay: rgba(255, 255, 255, 0.98);
       --border: #ced4da;
       --border-light: #dee2e6;
-      --border-focus: #fd7e14;
-      --primary: #fd7e14;
-      --primary-hover: #f76707;
-      --primary-glow: rgba(253, 126, 20, 0.3);
-      --primary-glow-weak: rgba(253, 126, 20, 0.1);
-      --primary-dim: #fff4e6;
+      --border-focus: #007fff;
+      --primary: #007fff;
+      --primary-hover: #0066cc;
+      --primary-glow: rgba(0, 127, 255, 0.3);
+      --primary-glow-weak: rgba(0, 127, 255, 0.1);
+      --primary-dim: #e6f2ff;
       --primary-text: #ffffff;
       --secondary: #3b5bdb;
       --secondary-hover: #364fc7;
@@ -1547,6 +1547,124 @@
       backdrop-filter: blur(4px);
       z-index: calc(var(--z-index-modal) - 1);
     }
+
+    /* ── SELETOR DE CORES & MODAL DE PERSONALIZAÇÃO ── */
+    .app-modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      z-index: var(--z-index-modal);
+      width: 90%;
+      max-width: 620px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px var(--shadow-heavy);
+    }
+
+    .modal-title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 14px;
+    }
+    .modal-header-text {
+      font-family: var(--font-display);
+      font-size: 26px;
+      color: var(--primary);
+      letter-spacing: 1px;
+    }
+
+    .modal-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-soft);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 18px 0 10px 0;
+    }
+
+    .color-swatches-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 10px;
+    }
+    .color-swatch-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 8px;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+    .color-swatch-item:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .color-swatch-item.active-swatch {
+      border-color: #ffffff;
+      box-shadow: 0 0 12px var(--primary-glow);
+      background: var(--surface3);
+    }
+    .color-swatch-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .color-swatch-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-soft);
+      text-align: center;
+    }
+
+    .theme-selection-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+    }
+    .theme-option-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      transition: var(--transition-fast);
+    }
+    .theme-option-card:hover {
+      border-color: var(--primary);
+    }
+    .theme-option-card.active-theme-card {
+      border-color: var(--primary);
+      background: var(--primary-dim);
+      color: var(--primary);
+    }
+
+    .control-btn.active-mode {
+      background-color: var(--primary);
+      color: #ffffff !important;
+      border-color: var(--primary);
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
   </style>
 </head>
 <body>
@@ -1569,17 +1687,18 @@
       <div class="logo-text">ELT TT PRO TOURNAMENT</div>
     </div>
     <div class="header-center-controls">
-      <button class="control-btn" onclick="app.ui.rotateTheme()">
-        <span id="theme-icon-indicator">☀️</span>
-        <span id="theme-label-indicator" class="btn-label">Tema: Escuro</span>
+      <button class="control-btn" onclick="app.ui.openThemeColorModal()">
+        <span>🎨</span><span class="btn-label">Temas & Cores</span>
       </button>
-      <button class="control-btn" id="theme-loop-btn" onclick="app.ui.toggleThemeLoop()">
-        <span>🔄</span><span class="btn-label" id="theme-loop-label">Loop: Desligado</span>
+      <button class="control-btn" id="tts-btn" onclick="app.ui.toggleTTS()">
+        <span>🔊</span><span class="btn-label" id="tts-btn-label">Voz: Off</span>
+      </button>
+      <button class="control-btn" id="pwa-install-btn" onclick="app.ui.openPwaInstallModal()" style="border-color: var(--success); color: var(--success);">
+        <span>📱</span><span class="btn-label">Instalar App</span>
       </button>
       <button class="control-btn" onclick="app.match.toggleFastScore()" style="border-color: var(--primary); color: var(--primary);">
         <span>⚡</span><span class="btn-label">Modo Placar</span>
       </button>
-    </div>
     </div>
     <div class="header-right-clock">
       <div id="clock">00:00:00</div>
@@ -1860,6 +1979,120 @@
     </div>
   </div>
 
+  <!-- MODAL DE PERSONALIZAÇÃO: TEMAS & PALETA DE CORES -->
+  <div class="app-modal" id="theme-color-modal">
+    <div class="modal-title-bar">
+      <div class="modal-header-text">🎨 Personalização de Temas & Cores</div>
+      <button class="control-btn" onclick="app.ui.closeThemeColorModal()">✕</button>
+    </div>
+
+    <div class="modal-section-title">1. Escolha a Cor de Destaque (Accent Palette)</div>
+    <div class="color-swatches-container" id="swatches-container">
+      <div class="color-swatch-item" onclick="app.ui.applyAccentColor('#007fff')">
+        <div class="color-swatch-circle" style="background-color: #007fff;"></div>
+        <div class="color-swatch-label">Azul Elétrico</div>
+      </div>
+      <div class="color-swatch-item" onclick="app.ui.applyAccentColor('#00e676')">
+        <div class="color-swatch-circle" style="background-color: #00e676;"></div>
+        <div class="color-swatch-label">Verde Esmeralda</div>
+      </div>
+      <div class="color-swatch-item" onclick="app.ui.applyAccentColor('#00f0ff')">
+        <div class="color-swatch-circle" style="background-color: #00f0ff;"></div>
+        <div class="color-swatch-label">Ciano Neon</div>
+      </div>
+      <div class="color-swatch-item" onclick="app.ui.applyAccentColor('#ff6b00')">
+        <div class="color-swatch-circle" style="background-color: #ff6b00;"></div>
+        <div class="color-swatch-label">Laranja Voador</div>
+      </div>
+      <div class="color-swatch-item" onclick="app.ui.applyAccentColor('#9d4edd')">
+        <div class="color-swatch-circle" style="background-color: #9d4edd;"></div>
+        <div class="color-swatch-label">Roxo Cyber</div>
+      </div>
+      <div class="color-swatch-item" onclick="app.ui.applyAccentColor('#ffd700')">
+        <div class="color-swatch-circle" style="background-color: #ffd700;"></div>
+        <div class="color-swatch-label">Amarelo Ouro</div>
+      </div>
+      <div class="color-swatch-item" onclick="app.ui.applyAccentColor('#ff3366')">
+        <div class="color-swatch-circle" style="background-color: #ff3366;"></div>
+        <div class="color-swatch-label">Vermelho Rubro</div>
+      </div>
+      <div class="color-swatch-item" onclick="app.ui.applyAccentColor('#ff007f')">
+        <div class="color-swatch-circle" style="background-color: #ff007f;"></div>
+        <div class="color-swatch-label">Rosa Magenta</div>
+      </div>
+    </div>
+
+    <div class="modal-section-title">2. Escolha o Tema de Fundo</div>
+    <div class="theme-selection-grid">
+      <div class="theme-option-card" id="tc-dark" onclick="app.ui.setTheme('dark')">🌙 Escuro</div>
+      <div class="theme-option-card" id="tc-light" onclick="app.ui.setTheme('light')">☀️ Claro</div>
+      <div class="theme-option-card" id="tc-cyberpunk" onclick="app.ui.setTheme('cyberpunk')">⚡ Cyberpunk</div>
+      <div class="theme-option-card" id="tc-matrix" onclick="app.ui.setTheme('matrix')">📟 Matrix</div>
+      <div class="theme-option-card" id="tc-synthwave" onclick="app.ui.setTheme('synthwave')">🕹️ Synthwave</div>
+      <div class="theme-option-card" id="tc-ice" onclick="app.ui.setTheme('ice')">❄️ Ice</div>
+      <div class="theme-option-card" id="tc-high-contrast" onclick="app.ui.setTheme('high-contrast')">👁️ Contraste</div>
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-top: 20px; align-items: center; justify-content: space-between; background: var(--surface2); padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+      <div>
+        <div style="font-weight: 700; font-size: 13px; color: var(--text);">Rotação Automática de Temas</div>
+        <div style="font-size: 11px; color: var(--text-soft);">Alterna o tema visual a cada 8 segundos</div>
+      </div>
+      <button class="control-btn" id="theme-loop-btn" onclick="app.ui.toggleThemeLoop()">
+        🔄 <span id="theme-loop-label">Loop: Desligado</span>
+      </button>
+    </div>
+
+    <div class="modal-section-title">3. Backup & Restauração de Dados</div>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <button class="action-btn btn-secondary" style="flex: 1;" onclick="app.ui.exportEcosystemBackup()">
+        📥 Exportar Backup (JSON)
+      </button>
+      <label class="action-btn btn-primary" style="flex: 1; text-align: center; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+        📤 Importar Backup (JSON)
+        <input type="file" id="backup-file-input" accept=".json" style="display: none;" onchange="app.ui.importEcosystemBackup(event)">
+      </label>
+    </div>
+
+    <div style="margin-top: 24px; text-align: right;">
+      <button class="action-btn btn-primary" onclick="app.ui.closeThemeColorModal()">Concluído</button>
+    </div>
+  </div>
+
+  <!-- MODAL DE INSTALAÇÃO PWA -->
+  <div class="app-modal" id="pwa-install-modal">
+    <div class="modal-title-bar">
+      <div class="modal-header-text">📱 Instalar Aplicativo ELT TT</div>
+      <button class="control-btn" onclick="app.ui.closePwaInstallModal()">✕</button>
+    </div>
+
+    <div style="font-size: 14px; color: var(--text-soft); line-height: 1.6; margin-bottom: 20px;">
+      Instale o ecossistema ELT TT Pro diretamente no seu dispositivo móvel ou computador para obter uma experiência de aplicativo nativo completa:
+    </div>
+
+    <ul style="margin: 0 0 20px 20px; color: var(--text); font-size: 13px; line-height: 1.8;">
+      <li>⚡ <b>Execução 100% Offline:</b> Funciona sem dependência de internet.</li>
+      <li>📺 <b>Tela Cheia Dedicada:</b> Sem barras de navegação do browser.</li>
+      <li>🚀 <b>Acesso Instantâneo:</b> Ícone direto na sua tela inicial / área de trabalho.</li>
+    </ul>
+
+    <div id="pwa-direct-install-container" style="display: none; margin-bottom: 20px;">
+      <button class="action-btn btn-success btn-block btn-large" onclick="app.ui.triggerPwaNativePrompt()">
+        📲 Instalar Agora no Dispositivo
+      </button>
+    </div>
+
+    <div class="modal-section-title">Como Instalar Manualmente:</div>
+    <div style="background: var(--surface2); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 12px; color: var(--text-soft); line-height: 1.6;">
+      <p style="margin: 0 0 8px 0;"><b>No Android / Chrome / Edge:</b> Clique nos três pontos do menu e selecione <i>"Adicionar à Tela de Início"</i> ou <i>"Instalar Aplicativo"</i>.</p>
+      <p style="margin: 0;"><b>No iPhone / iOS (Safari):</b> Toque no botão de <i>Compartilhar</i> (ícone com seta para cima) e escolha <i>"Adicionar à Tela de Início"</i>.</p>
+    </div>
+
+    <div style="margin-top: 24px; text-align: right;">
+      <button class="action-btn btn-primary" onclick="app.ui.closePwaInstallModal()">Entendido</button>
+    </div>
+  </div>
+
   <script>
 
     /**
@@ -1877,6 +2110,8 @@
           winLimit: 5,
           requireTieBreak: true,
           theme: 'dark',
+          accentColor: '#007fff',
+          ttsEnabled: false,
           sessionStartTime: Date.now()
         };
         this.fastMatchState = { scores: [0, 0], limit: 5, active: false };
@@ -2315,6 +2550,11 @@
           AudioEcosystemEngine.playTone('point');
         }
 
+        if (this.app.state.ttsEnabled) {
+          const pName = m.players[playerIndex];
+          this.app.ui.speakScore(`Ponto de ${pName}! ${m.scores[0]} a ${m.scores[1]}`);
+        }
+
         this.evaluateMatchState();
         this.app.saveEcosystemData();
       }
@@ -2501,11 +2741,16 @@
           AudioEcosystemEngine.playTone('point');
         }
 
+        const fs1 = this.app.fastMatchState.scores[0];
+        const fs2 = this.app.fastMatchState.scores[1];
+
+        if (this.app.state.ttsEnabled) {
+          this.app.ui.speakScore(`Ponto do Lado ${sideIndex + 1}! ${fs1} a ${fs2}`);
+        }
+
         this.syncFastPlacarUi();
 
         const fLimit = this.app.fastMatchState.limit;
-        const fs1 = this.app.fastMatchState.scores[0];
-        const fs2 = this.app.fastMatchState.scores[1];
 
         if ((fs1 >= fLimit || fs2 >= fLimit) && Math.abs(fs1 - fs2) >= 2) {
           AudioEcosystemEngine.playTone('victory');
@@ -2735,39 +2980,194 @@
         document.getElementById('session-timer-display').innerHTML = `Tempo de Sessão: <b style="color:var(--primary); font-family:var(--font-mono);">${outputStr}</b>`;
       }
 
-     rotateTheme() {
-        const structuralThemes = ['dark', 'light', 'cyberpunk', 'matrix', 'synthwave', 'ice', 'high-contrast'];
-        let currentIndex = structuralThemes.indexOf(this.app.state.theme);
-        this.app.state.theme = structuralThemes[(currentIndex + 1) % structuralThemes.length];
+      applyAccentColor(hexCode, save = true) {
+        if (!hexCode) hexCode = '#007fff';
+        
+        const hexToRgb = (hex) => {
+          let c = hex.replace('#', '');
+          if (c.length === 3) c = c.split('').map(x => x + x).join('');
+          const num = parseInt(c, 16);
+          return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
+        };
 
-        document.body.className = '';
-        if (this.app.state.theme !== 'dark') {
-          document.body.classList.add(`theme-${this.app.state.theme}`);
+        const rgb = hexToRgb(hexCode);
+        const root = document.documentElement;
+        root.style.setProperty('--primary', hexCode);
+        root.style.setProperty('--border-focus', hexCode);
+        root.style.setProperty('--primary-glow', `rgba(${rgb}, 0.4)`);
+        root.style.setProperty('--primary-glow-weak', `rgba(${rgb}, 0.15)`);
+        root.style.setProperty('--primary-dim', `rgba(${rgb}, 0.12)`);
+
+        const metaTheme = document.getElementById('meta-theme-color');
+        if (metaTheme) metaTheme.setAttribute('content', hexCode);
+
+        // Atualiza destaque visual das amostras
+        const swatches = document.querySelectorAll('.color-swatch-item');
+        swatches.forEach(sw => {
+          const onclickAttr = sw.getAttribute('onclick') || '';
+          if (onclickAttr.includes(hexCode)) {
+            sw.classList.add('active-swatch');
+          } else {
+            sw.classList.remove('active-swatch');
+          }
+        });
+
+        if (save) {
+          this.app.state.accentColor = hexCode;
+          this.app.saveEcosystemData();
         }
-        document.getElementById('theme-label-indicator').textContent = `Tema: ${this.app.state.theme.toUpperCase()}`;
+      }
+
+      setTheme(themeName) {
+        this.app.state.theme = themeName;
+        document.body.className = '';
+        if (themeName !== 'dark') {
+          document.body.classList.add(`theme-${themeName}`);
+        }
+
+        const themeCards = document.querySelectorAll('.theme-option-card');
+        themeCards.forEach(tc => {
+          if (tc.id === `tc-${themeName}`) {
+            tc.classList.add('active-theme-card');
+          } else {
+            tc.classList.remove('active-theme-card');
+          }
+        });
+
         this.app.saveEcosystemData();
       }
 
-      /* FUNÇÃO NOVA 1: LIGA / DESLIGA O LOOP AUTOMÁTICO */
+      rotateTheme() {
+        const structuralThemes = ['dark', 'light', 'cyberpunk', 'matrix', 'synthwave', 'ice', 'high-contrast'];
+        let currentIndex = structuralThemes.indexOf(this.app.state.theme);
+        const nextTheme = structuralThemes[(currentIndex + 1) % structuralThemes.length];
+        this.setTheme(nextTheme);
+      }
+
       toggleThemeLoop() {
         const btn = document.getElementById('theme-loop-btn');
         const label = document.getElementById('theme-loop-label');
 
         if (this.themeLoopIntervalId) {
-          // Se o loop já existe, desliga ele
           clearInterval(this.themeLoopIntervalId);
           this.themeLoopIntervalId = null;
-          btn.classList.remove('active-mode');
-          label.textContent = "Loop: Desligado";
+          if (btn) btn.classList.remove('active-mode');
+          if (label) label.textContent = "Loop: Desligado";
         } else {
-          // Se está desligado, liga rodando a cada 8 segundos (8000 milissegundos)
-          btn.classList.add('active-mode');
-          label.textContent = "Loop: ATIVO";
+          if (btn) btn.classList.add('active-mode');
+          if (label) label.textContent = "Loop: ATIVO";
           
           this.themeLoopIntervalId = setInterval(() => {
             this.rotateTheme();
           }, 8000); 
         }
+      }
+
+      toggleTTS() {
+        this.app.state.ttsEnabled = !this.app.state.ttsEnabled;
+        const btn = document.getElementById('tts-btn');
+        const label = document.getElementById('tts-btn-label');
+        if (btn && label) {
+          if (this.app.state.ttsEnabled) {
+            btn.classList.add('active-mode');
+            label.textContent = "Voz: Ativa";
+            this.speakScore("Narração por voz ativada");
+          } else {
+            btn.classList.remove('active-mode');
+            label.textContent = "Voz: Off";
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+          }
+        }
+        this.app.saveEcosystemData();
+      }
+
+      speakScore(text) {
+        if (!this.app.state.ttsEnabled || !('speechSynthesis' in window)) return;
+        try {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'pt-BR';
+          utterance.rate = 1.1;
+          window.speechSynthesis.speak(utterance);
+        } catch(e) {
+          console.error("Erro na síntese de voz:", e);
+        }
+      }
+
+      openThemeColorModal() {
+        document.getElementById('theme-color-modal').style.display = 'block';
+        document.getElementById('global-overlay-mask').style.display = 'block';
+        this.applyAccentColor(this.app.state.accentColor || '#007fff', false);
+        this.setTheme(this.app.state.theme || 'dark');
+      }
+
+      closeThemeColorModal() {
+        document.getElementById('theme-color-modal').style.display = 'none';
+        document.getElementById('global-overlay-mask').style.display = 'none';
+      }
+
+      openPwaInstallModal() {
+        document.getElementById('pwa-install-modal').style.display = 'block';
+        document.getElementById('global-overlay-mask').style.display = 'block';
+      }
+
+      closePwaInstallModal() {
+        document.getElementById('pwa-install-modal').style.display = 'none';
+        document.getElementById('global-overlay-mask').style.display = 'none';
+      }
+
+      setupPwaInstaller() {
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          this.app.deferredPwaPrompt = e;
+          const directBtn = document.getElementById('pwa-direct-install-container');
+          if (directBtn) directBtn.style.display = 'block';
+        });
+      }
+
+      triggerPwaNativePrompt() {
+        if (this.app.deferredPwaPrompt) {
+          this.app.deferredPwaPrompt.prompt();
+          this.app.deferredPwaPrompt.userChoice.then((choiceResult) => {
+            this.app.deferredPwaPrompt = null;
+            this.closePwaInstallModal();
+          });
+        }
+      }
+
+      exportEcosystemBackup() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.app.state, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `backup_elt_tt_pro_${new Date().toISOString().slice(0,10)}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+      }
+
+      importEcosystemBackup(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const importedData = JSON.parse(e.target.result);
+            if (importedData && typeof importedData === 'object' && importedData.players) {
+              this.app.state = { ...this.app.state, ...importedData };
+              this.app.saveEcosystemData();
+              this.applyAccentColor(this.app.state.accentColor || '#007fff', false);
+              this.setTheme(this.app.state.theme || 'dark');
+              alert("Backup importado com sucesso! O ecossistema foi restaurado.");
+              this.closeThemeColorModal();
+            } else {
+              alert("Erro: O arquivo selecionado não contém um formato de backup válido do ELT TT.");
+            }
+          } catch(err) {
+            alert("Erro ao ler arquivo de backup: " + err.message);
+          }
+        };
+        reader.readAsText(file);
       }
         
 
@@ -3192,7 +3592,7 @@
           y: -20 - Math.random() * 200,
           w: Math.random() * 8 + 6,
           h: Math.random() * 6 + 4,
-          colorCode: ['#ff9800', '#ffeb3b', '#2196f3', '#ff5252', '#4caf50'][Math.floor(Math.random() * 5)],
+          colorCode: ['#ff007f', '#ffeb3b', '#2196f3', '#ff5252', '#4caf50'][Math.floor(Math.random() * 5)],
           speedY: Math.random() * 4 + 3,
           speedX: Math.random() * 2 - 1,
           spinAngle: Math.random() * Math.PI * 2,
@@ -3286,7 +3686,8 @@
         this.tournament = new TournamentBracketEngine(this);
         this.ui = new VisualInterfaceManager(this);
         this.lastWinnerReused = null;
-        this.isFastMatchActive = false; // Flag de isolamento estrutural do Modo Placar simples
+        this.isFastMatchActive = false;
+        this.deferredPwaPrompt = null;
       }
 
       /**
@@ -3295,13 +3696,19 @@
       bootstrap() {
         this.loadEcosystemData();
         this.ui.setupInterfaceListeners();
+        this.ui.setupPwaInstaller();
         
-        // Sincroniza o tema interceptado do LocalStorage para a folha de renderização
-        document.body.className = '';
-        if (this.state.theme !== 'dark') {
-          document.body.classList.add(`theme-${this.state.theme}`);
+        // Sincroniza o tema e cor de destaque interceptados do LocalStorage
+        this.ui.setTheme(this.state.theme || 'dark');
+        this.ui.applyAccentColor(this.state.accentColor || '#007fff', false);
+
+        // Sincroniza botão de TTS
+        const ttsBtn = document.getElementById('tts-btn');
+        const ttsLabel = document.getElementById('tts-btn-label');
+        if (ttsBtn && ttsLabel && this.state.ttsEnabled) {
+          ttsBtn.classList.add('active-mode');
+          ttsLabel.textContent = "Voz: Ativa";
         }
-        document.getElementById('theme-label-indicator').textContent = `Tema: ${this.state.theme.toUpperCase()}`;
 
         this.ui.updateEcosystemInterface();
       }
