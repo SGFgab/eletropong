@@ -58,6 +58,12 @@ Como o ecossistema é baseado em engenharia puramente Client-Side e configurado 
 2. Certifique-se de manter os arquivos `index.html`, `manifest.json` e o script do *Service Worker* no mesmo nível de diretório.
 3. Para suporte completo a instalação offline em dispositivos móveis e desktops, hospede os arquivos sob um protocolo seguro (`https://`) ou execute localmente via ambiente seguro localhost.
 
+## ⚡ Novidades da Versão 2026.5
+- **Seletor de Temas & Paleta de Cores de Destaque:** O sistema trocou a cor rosa padrão por um Azul Elétrico Esportivo e introduziu o modal **"🎨 Temas & Cores"** com 8 cores de destaque (Azul Elétrico, Verde Esmeralda, Ciano Neon, Laranja, Roxo, Amarelo, Vermelho e Rosa Magenta) e seleção direta de 7 temas visuais.
+- **Locutor de Arena por Voz (TTS):** Narração opcional do placar em tempo real em português via *Web Speech Synthesis API*, vocalizando pontos e final de set.
+- **Central de Instalação de App (PWA Nativo):** Interface dedicada com botão de instalação rápida e guia passo a passo para Android, iPhone (iOS Safari) e PC Desktop.
+- **Módulo de Backup e Restauração de Dados:** Ferramenta para exportar e importar arquivos de backup em formato `.json` com todo o banco de dados do campeonato (atletas, ELO e histórico).
+
 ## ⚡ Novidades da Versão 2026.4
 - **Modo Placar:** Interface de treino avulso simplificada, sem textos desnecessários e com fontes massivamente ampliadas para alta visibilidade.
 - **Novos Temas Visuais Premium:** Rotação nativa expandida com os temas Matrix Digital, Retro Synthwave e Ice Blizzard.
